@@ -23,19 +23,27 @@ class Service: ServiceProtocol {
     // MARK: - Private methods
     
     private func getRSSModel(URL: URL, completion: @escaping (RSSModel?, Error?) -> Void) {
-        Alamofire.request(URL.absoluteString, method: .get).response { response in
-            
-            if response.response?.statusCode == 200 {
-                guard let data = response.data else {
-                    completion(nil, response.error)
-                    return
-                }
+        DispatchQueue.global().async {
+            Alamofire.request(URL.absoluteString, method: .get).response { response in
                 
-                XMLRSSParser().parse(data: data) { rss, error in
-                    completion(rss, error)
+                if response.response?.statusCode == 200 {
+                    guard let data = response.data else {
+                        DispatchQueue.main.async {
+                            completion(nil, response.error)
+                        }
+                        return
+                    }
+                    
+                    XMLRSSParser().parse(data: data) { rss, error in
+                        DispatchQueue.main.async {
+                            completion(rss, error)
+                        }
+                    }
+                } else {
+                    DispatchQueue.main.async {
+                        completion(nil, response.error)
+                    }
                 }
-            } else {
-                completion(nil, response.error)
             }
         }
     }

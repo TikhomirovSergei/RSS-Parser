@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="14490.70" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="tJG-TH-5CI">
+    <device id="retina6_1" orientation="portrait">
+        <adaptation id="fullscreen"/>
+    </device>
+    <dependencies>
+        <deployment identifier="iOS"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="14490.49"/>
+        <capability name="Safe area layout guides" minToolsVersion="9.0"/>
+        <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
+    </dependencies>
+    <scenes>
+        <!--Main View Controller-->
+        <scene sceneID="tne-QT-ifu">
+            <objects>
+                <viewController id="BYZ-38-t0r" customClass="MainViewController" customModule="RSS_Parser" customModuleProvider="target" sceneMemberID="viewController">
+                    <view key="view" contentMode="scaleToFill" id="8bC-Xf-vdC">
+                        <rect key="frame" x="0.0" y="0.0" width="414" height="808"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="51C-2H-pgK" customClass="UITableView">
+                                <rect key="frame" x="0.0" y="0.0" width="414" height="774"/>
+                                <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                            </view>
+                            <activityIndicatorView opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" style="gray" translatesAutoresizingMaskIntoConstraints="NO" id="Vst-aN-ehV">
+                                <rect key="frame" x="182" y="379" width="50" height="50"/>
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="50" id="L6f-m8-R6k"/>
+                                    <constraint firstAttribute="width" constant="50" id="v3U-L9-zJZ"/>
+                                </constraints>
+                            </activityIndicatorView>
+                            <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="Sw7-ZW-Hdf">
+                                <rect key="frame" x="87" y="344" width="240" height="120"/>
+                                <subviews>
+                                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Feed is empty" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="3uI-oh-FVr">
+                                        <rect key="frame" x="20" y="20" width="200" height="21"/>
+                                        <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                        <nil key="textColor"/>
+                                        <nil key="highlightedColor"/>
+                                    </label>
+                                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="7j2-Nq-sEc">
+                                        <rect key="frame" x="20" y="61" width="200" height="39"/>
+                                        <state key="normal" title="Add RSS"/>
+                                        <connections>
+                                            <action selector="addRSSButtonClicked:" destination="BYZ-38-t0r" eventType="touchUpInside" id="PsT-uk-K9P"/>
+                                        </connections>
+                                    </button>
+                                </subviews>
+                                <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                <constraints>
+                                    <constraint firstAttribute="trailing" secondItem="3uI-oh-FVr" secondAttribute="trailing" constant="20" id="BJX-RZ-A9V"/>
+                                    <constraint firstItem="7j2-Nq-sEc" firstAttribute="leading" secondItem="Sw7-ZW-Hdf" secondAttribute="leading" constant="20" id="Jsd-tT-SpT"/>
+                                    <constraint firstItem="3uI-oh-FVr" firstAttribute="leading" secondItem="Sw7-ZW-Hdf" secondAttribute="leading" constant="20" id="UXC-Ad-lrh"/>
+                                    <constraint firstItem="7j2-Nq-sEc" firstAttribute="top" secondItem="3uI-oh-FVr" secondAttribute="bottom" constant="20" id="Zco-YZ-6xI"/>
+                                    <constraint firstAttribute="width" constant="240" id="ZwW-HU-FUd"/>
+                                    <constraint firstItem="3uI-oh-FVr" firstAttribute="top" secondItem="Sw7-ZW-Hdf" secondAttribute="top" constant="20" id="bZr-bq-MI5"/>
+                                    <constraint firstAttribute="trailing" secondItem="7j2-Nq-sEc" secondAttribute="trailing" constant="20" id="gwS-Th-TCt"/>
+                                    <constraint firstAttribute="bottom" secondItem="7j2-Nq-sEc" secondAttribute="bottom" constant="20" id="ha1-ZH-bhv"/>
+                                    <constraint firstAttribute="height" constant="120" id="mGy-6p-Jvq"/>
+                                </constraints>
+                            </view>
+                        </subviews>
+                        <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                        <constraints>
+                            <constraint firstItem="Vst-aN-ehV" firstAttribute="centerY" secondItem="8bC-Xf-vdC" secondAttribute="centerY" id="6jY-WV-7qM"/>
+                            <constraint firstItem="Vst-aN-ehV" firstAttribute="centerX" secondItem="8bC-Xf-vdC" secondAttribute="centerX" id="BNw-uB-NBx"/>
+                            <constraint firstItem="51C-2H-pgK" firstAttribute="leading" secondItem="6Tk-OE-BBY" secondAttribute="leading" id="FWt-mc-UQW"/>
+                            <constraint firstItem="Sw7-ZW-Hdf" firstAttribute="centerX" secondItem="8bC-Xf-vdC" secondAttribute="centerX" id="J6t-I8-CMg"/>
+                            <constraint firstItem="6Tk-OE-BBY" firstAttribute="bottom" secondItem="51C-2H-pgK" secondAttribute="bottom" id="KgD-jd-tPD"/>
+                            <constraint firstItem="6Tk-OE-BBY" firstAttribute="trailing" secondItem="51C-2H-pgK" secondAttribute="trailing" id="hxS-cc-bSV"/>
+                            <constraint firstItem="Sw7-ZW-Hdf" firstAttribute="centerY" secondItem="8bC-Xf-vdC" secondAttribute="centerY" id="ljM-OD-Rhh"/>
+                            <constraint firstItem="51C-2H-pgK" firstAttribute="top" secondItem="6Tk-OE-BBY" secondAttribute="top" id="up7-AP-Coh"/>
+                        </constraints>
+                        <viewLayoutGuide key="safeArea" id="6Tk-OE-BBY"/>
+                    </view>
+                    <navigationItem key="navigationItem" id="oTu-rv-6u1"/>
+                    <simulatedNavigationBarMetrics key="simulatedTopBarMetrics" translucent="NO" prompted="NO"/>
+                    <connections>
+                        <outlet property="activityIndicator" destination="Vst-aN-ehV" id="BR0-Tz-g3Z"/>
+                        <outlet property="addRSSButton" destination="7j2-Nq-sEc" id="fNz-Dz-snB"/>
+                        <outlet property="emptyListLabel" destination="3uI-oh-FVr" id="e3I-YE-gr8"/>
+                        <outlet property="emptyListView" destination="Sw7-ZW-Hdf" id="CLC-oE-Lle"/>
+                        <outlet property="tableView" destination="51C-2H-pgK" id="cpY-Vx-htf"/>
+                    </connections>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="dkx-z0-nzr" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="131.8840579710145" y="138.61607142857142"/>
+        </scene>
+        <!--Navigation Controller-->
+        <scene sceneID="2Cj-Ux-PKE">
+            <objects>
+                <navigationController id="tJG-TH-5CI" sceneMemberID="viewController">
+                    <navigationBar key="navigationBar" contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" id="djT-ZL-Kxt">
+                        <rect key="frame" x="0.0" y="44" width="414" height="44"/>
+                        <autoresizingMask key="autoresizingMask"/>
+                    </navigationBar>
+                    <connections>
+                        <segue destination="BYZ-38-t0r" kind="relationship" relationship="rootViewController" id="az4-cO-1RH"/>
+                    </connections>
+                </navigationController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="iPB-Lm-FTn" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="-733" y="139"/>
+        </scene>
+    </scenes>
+</document>

@@ -17,13 +17,9 @@ class MainInteractor: MainInteractorProtocol {
         self.presenter = presenter
     }
     
-    func openUrl(with urlString: String) {
-        serverService.openUrl(with: urlString)
-    }
-    
-    func getFeeds(with urlString: String, completion: @escaping ([RSSItemModel]?, Error?) -> Void) {
-        serverService.getFeeds(urlString: urlString) { items, error in
-            completion(items, error)
+    func getNews(with urlString: String, completion: @escaping (RSSModel?, Error?) -> Void) {
+        serverService.getNews(urlString: urlString) { rss, error in
+            completion(rss, error)
         }
     }
 }

@@ -8,7 +8,7 @@
 
 import UIKit
 
-class FeedCell: UITableViewCell {
+class NewsCell: UITableViewCell {
     @IBOutlet var imageViewWrapper: UIView!
     @IBOutlet var imgView: UIImageView!
     @IBOutlet var contentViewWrapper: UIView!

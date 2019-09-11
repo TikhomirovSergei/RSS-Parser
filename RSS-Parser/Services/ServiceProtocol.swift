@@ -9,6 +9,5 @@
 import Foundation
 
 protocol ServiceProtocol: class {
-    func openUrl(with urlString: String)
-    func getFeeds(urlString: String, completion: @escaping ([RSSItemModel]?, Error?) -> Void)
+    func getNews(urlString: String, completion: @escaping (RSSModel?, Error?) -> Void)
 }

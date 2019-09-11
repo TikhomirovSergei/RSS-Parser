@@ -10,7 +10,8 @@ import UIKit
 
 class MainViewController: UIViewController, MainViewProtocol, UITableViewDelegate, UITableViewDataSource {
     private let cellId = "cellId"
-    private let nibFileName = "FeedCell"
+    private let nibFileName = "NewsCell"
+    private let _helper = Helper()
     
     var presenter: MainPresenterProtocol!
     let configurator: MainConfiguratorProtocol = MainConfigurator()
@@ -34,24 +35,16 @@ class MainViewController: UIViewController, MainViewProtocol, UITableViewDelegat
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let cell = tableView.dequeueReusableCell(withIdentifier: cellId, for: indexPath) as! FeedCell
+        let cell = tableView.dequeueReusableCell(withIdentifier: cellId, for: indexPath) as! NewsCell
         let currentLastItem = rssItems[indexPath.row]
         
         cell.selectionStyle = .none
         cell.titleLabel.text = currentLastItem.title
         cell.pubDateLabel.text = currentLastItem.pubDate
         cell.descriptionLabel.text = currentLastItem.description
-        cell.imageView!.image = self.imageWithImage(image: #imageLiteral(resourceName: "news"), scaledToSize: CGSize(width: 70, height: 70))
+        cell.imageView!.image = _helper.imageWithImage(image: #imageLiteral(resourceName: "news"), scaledToSize: CGSize(width: 70, height: 70))
         
         return cell
-    }
-    
-    func imageWithImage(image:UIImage, scaledToSize newSize:CGSize) -> UIImage{
-        UIGraphicsBeginImageContextWithOptions(newSize, false, 0.0)
-        image.draw(in: CGRect(x: 0, y: 0, width: newSize.width, height: newSize.height))
-        let newImage:UIImage = UIGraphicsGetImageFromCurrentImageContext()!
-        UIGraphicsEndImageContext()
-        return newImage
     }
     
     @IBAction func addRSSButtonClicked(_ sender: Any) {
@@ -103,21 +96,21 @@ class MainViewController: UIViewController, MainViewProtocol, UITableViewDelegat
     }
     
     func showAI() {
-        self.view.addSubview(activityIndicator)
+        activityIndicator.alpha = 1
         activityIndicator.startAnimating()
     }
     
     func hideAI() {
         activityIndicator.stopAnimating()
-        activityIndicator.removeFromSuperview()
+        activityIndicator.alpha = 0
     }
     
     func showStartView() {
-        self.view.addSubview(emptyListView)
+        emptyListView.alpha = 1
     }
     
     func hideStartView() {
-        emptyListView.removeFromSuperview()
+        emptyListView.alpha = 0
     }
     
     func tableBinging() {
@@ -127,44 +120,33 @@ class MainViewController: UIViewController, MainViewProtocol, UITableViewDelegat
         self.tableView.dataSource = self
     }
     
-    func setTitle(/*title: String, leftButton: UIBarButtonItem?, rightButtons: [UIBarButtonItem]?*/) {
-        self.navigationItem.title = "RSS Parser"
-        
+    func setTitle(title: String) {
+        self.navigationItem.title = title
         self.navigationItem.setHidesBackButton(true, animated:true)
-        self.navigationItem.leftBarButtonItems = []
-        self.navigationItem.leftBarButtonItem = UIBarButtonItem(customView: createCustomButton(name: "menuIcon", selector: #selector(leftClick)))
-        self.navigationItem.leftBarButtonItem?.title = ""
+    }
+    
+    func showMenuButton() {
+        self.navigationItem.leftBarButtonItem = UIBarButtonItem(customView: _helper.createCustomButton(name: "menuIcon", selector: #selector(menuClick)))
+    }
+    
+    func showRightBarButtons() {
+        let add = UIBarButtonItem(customView: _helper.createCustomButton(name: "addIcon", selector: #selector(addNewRSSStreamClick)))
+        let delete = UIBarButtonItem(customView: _helper.createCustomButton(name: "deleteIcon", selector: #selector(deleteRSSStreamClick)))
+        let info = UIBarButtonItem(customView: _helper.createCustomButton(name: "infoIcon", selector: #selector(infoAboutRSSStreamClick)))
         
-        let icon1 = UIBarButtonItem(customView: createCustomButton(name: "addIcon", selector: #selector(rightClick)))
-        let icon2 = UIBarButtonItem(customView: createCustomButton(name: "deleteIcon", selector: #selector(rightClick)))
-        let icon3 = UIBarButtonItem(customView: createCustomButton(name: "infoIcon", selector: #selector(rightClick)))
-        
-        self.navigationItem.rightBarButtonItems = [icon3, icon2, icon1]
-        self.navigationItem.rightBarButtonItem?.title = ""
+        self.navigationItem.rightBarButtonItems = [info, delete, add]
     }
     
-    func createCustomButton(name: String, selector: Selector) -> UIButton {
-        let button = UIButton(frame: CGRect(x: 0, y: 0, width: 24, height: 24))
-        var img = self.imageWithImage(x: 0, image: UIImage(named: name)!, scaledToSize: CGSize(width: 24, height: 24))
-        img = img.withRenderingMode(.alwaysTemplate)
-        button.setImage(img, for: .normal)
-        button.titleLabel?.font = UIFont.boldSystemFont(ofSize: 18)
-        button.addTarget(self, action: selector, for: .touchUpInside)
-        return button
+    @objc func menuClick(sender: UIBarButtonItem) {
     }
     
-    func imageWithImage(x: CGFloat, image:UIImage, scaledToSize newSize:CGSize) -> UIImage{
-        UIGraphicsBeginImageContextWithOptions(newSize, false, 0.0)
-        image.draw(in: CGRect(x: x, y: 0, width: newSize.width, height: newSize.height))
-        let newImage:UIImage = UIGraphicsGetImageFromCurrentImageContext()!
-        UIGraphicsEndImageContext()
-        return newImage
+    @objc func addNewRSSStreamClick(sender: UIBarButtonItem) {
     }
     
-    @objc func leftClick(sender: UIBarButtonItem) {
+    @objc func deleteRSSStreamClick(sender: UIBarButtonItem) {
     }
     
-    @objc func rightClick(sender: UIBarButtonItem) {
+    @objc func infoAboutRSSStreamClick(sender: UIBarButtonItem) {
     }
     
     func fetchData(items: [RSSItemModel]) {

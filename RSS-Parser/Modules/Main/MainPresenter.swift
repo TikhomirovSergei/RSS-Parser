@@ -7,6 +7,7 @@
 //
 
 import Foundation
+import UIKit
 
 class MainPresenter: MainPresenterProtocol {
     weak var view: MainViewProtocol!
@@ -20,6 +21,7 @@ class MainPresenter: MainPresenterProtocol {
     // MARK: - MainPresenterProtocol methods
     
     func configureView() {
+        self.view.setTitle(title: "RSS parser")
         view.tableBinging()
     }
     
@@ -33,25 +35,22 @@ class MainPresenter: MainPresenterProtocol {
             
             self.view.hideStartView()
             self.view.showAI()
-            self.interactor.getFeeds(with: text) { items, error in
-                guard let items = items else {
-                    return
+            self.interactor.getNews(with: text) { rss, error in
+                guard let rss = rss,
+                    error == nil else {
+                        self.view.hideAI()
+                        self.view.showStartView()
+                        self.view.showAlertView(with: error!.localizedDescription)
+                        return
                 }
                 
                 self.view.hideAI()
-                self.view.setTitle()
-                self.view.fetchData(items: items)
+                self.view.setTitle(title: rss.title)
+                self.view.showMenuButton()
+                self.view.showRightBarButtons()
+                self.view.fetchData(items: rss.items)
             }
         }
     }
     
-    func closeButtonClicked() {
-        router.closeCurrentViewController()
-    }
-    
-    func urlButtonClicked(with urlString: String?) {
-        if let url = urlString {
-            interactor.openUrl(with: url)
-        }
-    }
 }

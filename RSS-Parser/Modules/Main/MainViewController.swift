@@ -22,8 +22,6 @@ class MainViewController: UIViewController, MainViewProtocol, UITableViewDelegat
     @IBOutlet weak var emptyListLabel: UILabel!
     @IBOutlet weak var addRSSButton: UIButton!
     
-    private var rssItems: [RSSItemModel] = []
-    
     override func viewDidLoad() {
         super.viewDidLoad()
         configurator.configure(with: self)
@@ -31,11 +29,12 @@ class MainViewController: UIViewController, MainViewProtocol, UITableViewDelegat
     }
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return rssItems.count
+        return presenter.getNewsItemModel().count
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: cellId, for: indexPath) as! NewsCell
+        let rssItems = presenter.getNewsItemModel()
         let currentLastItem = rssItems[indexPath.row]
         
         cell.selectionStyle = .none
@@ -48,7 +47,7 @@ class MainViewController: UIViewController, MainViewProtocol, UITableViewDelegat
     }
     
     @IBAction func addRSSButtonClicked(_ sender: Any) {
-        presenter.addRSSButtonClicked()
+        presenter.addUrlButtonClicked()
     }
     
     // MARK: - MainViewProtocol methods
@@ -95,12 +94,12 @@ class MainViewController: UIViewController, MainViewProtocol, UITableViewDelegat
         }
     }
     
-    func showAI() {
+    func showLoadingView() {
         activityIndicator.alpha = 1
         activityIndicator.startAnimating()
     }
     
-    func hideAI() {
+    func hideLoadingView() {
         activityIndicator.stopAnimating()
         activityIndicator.alpha = 0
     }
@@ -126,13 +125,13 @@ class MainViewController: UIViewController, MainViewProtocol, UITableViewDelegat
     }
     
     func showMenuButton() {
-        self.navigationItem.leftBarButtonItem = UIBarButtonItem(customView: _helper.createCustomButton(name: "menuIcon", selector: #selector(menuClick)))
+        self.navigationItem.leftBarButtonItem = UIBarButtonItem(customView: _helper.createCustomButton(view: self, name: "menuIcon", selector: #selector(menuClick)))
     }
     
     func showRightBarButtons() {
-        let add = UIBarButtonItem(customView: _helper.createCustomButton(name: "addIcon", selector: #selector(addNewRSSStreamClick)))
-        let delete = UIBarButtonItem(customView: _helper.createCustomButton(name: "deleteIcon", selector: #selector(deleteRSSStreamClick)))
-        let info = UIBarButtonItem(customView: _helper.createCustomButton(name: "infoIcon", selector: #selector(infoAboutRSSStreamClick)))
+        let add = UIBarButtonItem(customView: _helper.createCustomButton(view: self, name: "addIcon", selector: #selector(self.addNewRSSStreamClick)))
+        let delete = UIBarButtonItem(customView: _helper.createCustomButton(view: self, name: "deleteIcon", selector: #selector(deleteRSSStreamClick)))
+        let info = UIBarButtonItem(customView: _helper.createCustomButton(view: self, name: "infoIcon", selector: #selector(infoAboutRSSStreamClick)))
         
         self.navigationItem.rightBarButtonItems = [info, delete, add]
     }
@@ -149,8 +148,7 @@ class MainViewController: UIViewController, MainViewProtocol, UITableViewDelegat
     @objc func infoAboutRSSStreamClick(sender: UIBarButtonItem) {
     }
     
-    func fetchData(items: [RSSItemModel]) {
-        self.rssItems = items
+    func reloadData() {
         self.tableView.reloadData()
     }
 

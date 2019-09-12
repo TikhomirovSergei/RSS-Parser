@@ -10,5 +10,6 @@ import Foundation
 
 struct RSSModel {
     var title: String
-    var items: [RSSItemModel]
+    var link: String
+    var items: [NewsItemModel]
 }

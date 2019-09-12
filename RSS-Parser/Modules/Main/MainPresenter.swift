@@ -21,36 +21,51 @@ class MainPresenter: MainPresenterProtocol {
     // MARK: - MainPresenterProtocol methods
     
     func configureView() {
-        self.view.setTitle(title: "RSS parser")
+        self.view.setTitle(title: interactor.defaultTitle)
         view.tableBinging()
     }
     
-    func addRSSButtonClicked() {
-        view.setURLView(title: "New RSS", inputPlaceholder: "set url") { text in
-            
-            guard let text = text else {
-                print("User cancelled action.")
-                return
-            }
-            
-            self.view.hideStartView()
-            self.view.showAI()
-            self.interactor.getNews(with: text) { rss, error in
-                guard let rss = rss,
-                    error == nil else {
-                        self.view.hideAI()
-                        self.view.showStartView()
-                        self.view.showAlertView(with: error!.localizedDescription)
-                        return
-                }
-                
-                self.view.hideAI()
-                self.view.setTitle(title: rss.title)
-                self.view.showMenuButton()
-                self.view.showRightBarButtons()
-                self.view.fetchData(items: rss.items)
-            }
+    func getNewsItemModel() -> [NewsItemModel] {
+        return interactor.getNewsItemModel()
+    }
+    
+    func addUrlButtonClicked() {
+        interactor.addNewUrl()
+    }
+    
+    func updateHeaderInfo(title: String, isEmptyList: Bool) {
+        self.view.setTitle(title: title)
+        if !isEmptyList {
+            self.view.showMenuButton()
+            self.view.showRightBarButtons()
         }
+    }
+    
+    func startLoading() {
+        self.view.hideStartView()
+        self.view.showLoadingView()
+    }
+    
+    func endLoading() {
+        self.view.hideLoadingView()
+    }
+    
+    func showStartView() {
+        self.view.showStartView()
+    }
+    
+    func showError(error: Error) {
+        self.view.showAlertView(with: error.localizedDescription)
+    }
+    
+    func showSetUrlView(title: String, inputPlaceholder: String, completion: @escaping (_ text: String?) -> Void) {
+        view.setURLView(title: title, inputPlaceholder: inputPlaceholder) { text in
+            completion(text)
+        }
+    }
+    
+    func reloadData() {
+        self.view.reloadData()        
     }
     
 }

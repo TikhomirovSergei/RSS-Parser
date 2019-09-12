@@ -14,8 +14,8 @@ protocol MainViewProtocol: class {
     func showMenuButton()
     func showRightBarButtons()
     
-    func showAI()
-    func hideAI()
+    func showLoadingView()
+    func hideLoadingView()
     func showStartView()
     func hideStartView()
     
@@ -23,17 +23,33 @@ protocol MainViewProtocol: class {
     func showAlertView(with text: String)
     
     func tableBinging()
-    func fetchData(items: [RSSItemModel])
+    func reloadData()
 }
 
 protocol MainPresenterProtocol: class {
     var router: MainRouterProtocol! { set get }
+    
     func configureView()
-    func addRSSButtonClicked()
+    
+    func updateHeaderInfo(title: String, isEmptyList: Bool)
+    func startLoading()
+    func endLoading()
+    func showStartView()
+    
+    func addUrlButtonClicked()
+    
+    func showSetUrlView(title: String, inputPlaceholder: String, completion: @escaping (_ text: String?) -> Void)
+    func getNewsItemModel() -> [NewsItemModel]
+    func reloadData()
+    
+    func showError(error: Error)
 }
 
 protocol MainInteractorProtocol: class {
-    func getNews(with urlString: String, completion: @escaping (RSSModel?, Error?) -> Void)
+    var defaultTitle: String { get }
+    
+    func addNewUrl()
+    func getNewsItemModel() -> [NewsItemModel]
 }
 
 protocol MainRouterProtocol: class {

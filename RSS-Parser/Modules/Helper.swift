@@ -11,13 +11,13 @@ import UIKit
 
 class Helper {
     
-    func createCustomButton(name: String, selector: Selector) -> UIButton {
+    func createCustomButton(view: UIViewController, name: String, selector: Selector) -> UIButton {
         let button = UIButton(frame: CGRect(x: 0, y: 0, width: 24, height: 24))
         var img = self.imageWithImage(image: UIImage(named: name)!, scaledToSize: CGSize(width: 24, height: 24))
         img = img.withRenderingMode(.alwaysTemplate)
         button.setImage(img, for: .normal)
         button.titleLabel?.font = UIFont.boldSystemFont(ofSize: 18)
-        button.addTarget(self, action: selector, for: .touchUpInside)
+        button.addTarget(view, action: selector, for: .touchUpInside)
         return button
     }
     

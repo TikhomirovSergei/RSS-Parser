@@ -9,15 +9,19 @@
 import Foundation
 
 class XMLRSSParser: NSObject, XMLParserDelegate {
-    private var rss: RSSModel = RSSModel(title: "", items: [])
+    private var rss: RSSModel = RSSModel(title: "", link: "", items: [])
     private var currentElement = ""
     private var currentTitle = ""
+    private var currentLink = ""
     private var currentDescription = ""
     private var currentPubDate = ""
+    private var currentAuthor = ""
     private var currentImageUrl: String? = nil
     
     private var firstTitleElement = ""
-    private var isFirstElement = true
+    private var isFirstTitleElement = true
+    private var firstLinkElement = ""
+    private var isFirstLinkElement = true
     var parserCompletionHandler: ((RSSModel?, Error?) -> Void)?
     
     func parse(data: Data, completion: @escaping (RSSModel?, Error?) -> Void) {
@@ -32,8 +36,10 @@ class XMLRSSParser: NSObject, XMLParserDelegate {
         currentElement = elementName
         if currentElement == "item" || currentElement == "channel" {
             currentTitle = ""
+            currentLink = ""
             currentDescription = ""
             currentPubDate = ""
+            currentAuthor = ""
             currentImageUrl = nil
         }
     }
@@ -41,29 +47,44 @@ class XMLRSSParser: NSObject, XMLParserDelegate {
     func parser(_ parser: XMLParser, foundCharacters string: String) {
         switch currentElement {
         case "title": do {
-            if isFirstElement {
+            if isFirstTitleElement {
                 firstTitleElement += string
-                isFirstElement = false
+                isFirstTitleElement = false
             } else {
                 currentTitle += string
-            }
-        }
+            }}
+            
+        case "link": do {
+            if isFirstLinkElement {
+                firstLinkElement += string
+                isFirstLinkElement = false
+            } else {
+                currentLink += string
+            }}
+            
         case "description": do {
             let str = string.replacingOccurrences(of: "<[^>]+>", with: "", options: .regularExpression, range: nil)
             currentDescription += str
             currentImageUrl = nil
             }
+            
         case "pubDate": currentPubDate += string
+        case "dc:creator": currentAuthor += string
         default: break
         }
     }
     
     func parser(_ parser: XMLParser, didEndElement elementName: String, namespaceURI: String?, qualifiedName qName: String?) {
         if elementName == "item" {
-            let rssItem = RSSItemModel(title: currentTitle, description: currentDescription, pubDate: currentPubDate, imageUrl: currentImageUrl)
+            let rssItem = RSSItemModel(
+                title: currentTitle, link: currentLink,
+                description: currentDescription, pubDate: currentPubDate,
+                author: currentAuthor, imageUrl: currentImageUrl)
+            
             rss.items += [rssItem]
         } else if elementName == "channel" {
             rss.title = firstTitleElement
+            rss.link = firstLinkElement
         }
     }
     

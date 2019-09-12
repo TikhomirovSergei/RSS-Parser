@@ -29,6 +29,7 @@
 		A5E21808232983B7003BB61E /* XMLRSSParser.swift in Sources */ = {isa = PBXBuildFile; fileRef = A5E21807232983B7003BB61E /* XMLRSSParser.swift */; };
 		A5E2180A23298467003BB61E /* RSSModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = A5E2180923298467003BB61E /* RSSModel.swift */; };
 		A5E2180C23298FFD003BB61E /* Helper.swift in Sources */ = {isa = PBXBuildFile; fileRef = A5E2180B23298FFD003BB61E /* Helper.swift */; };
+		A5E2180E232A4709003BB61E /* NewsItemProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = A5E2180D232A4709003BB61E /* NewsItemProtocol.swift */; };
 		F6DD54EE6275258D52A92740 /* Pods_RSS_ParserTests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5191B426E00F302500B324E9 /* Pods_RSS_ParserTests.framework */; };
 /* End PBXBuildFile section */
 
@@ -73,6 +74,7 @@
 		A5E21807232983B7003BB61E /* XMLRSSParser.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = XMLRSSParser.swift; sourceTree = "<group>"; };
 		A5E2180923298467003BB61E /* RSSModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RSSModel.swift; sourceTree = "<group>"; };
 		A5E2180B23298FFD003BB61E /* Helper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Helper.swift; sourceTree = "<group>"; };
+		A5E2180D232A4709003BB61E /* NewsItemProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewsItemProtocol.swift; sourceTree = "<group>"; };
 		F3BBD66BEFFF56F56098EB7E /* Pods-RSS-ParserTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-RSS-ParserTests.debug.xcconfig"; path = "Target Support Files/Pods-RSS-ParserTests/Pods-RSS-ParserTests.debug.xcconfig"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -157,6 +159,7 @@
 			children = (
 				A5E2180523298269003BB61E /* RSSItemModel.swift */,
 				A5E2180923298467003BB61E /* RSSModel.swift */,
+				A5E2180D232A4709003BB61E /* NewsItemProtocol.swift */,
 			);
 			path = Entities;
 			sourceTree = "<group>";
@@ -405,6 +408,7 @@
 				A5E2180C23298FFD003BB61E /* Helper.swift in Sources */,
 				A5E218032328119F003BB61E /* NewsCell.swift in Sources */,
 				A5E217C523278EE8003BB61E /* AppDelegate.swift in Sources */,
+				A5E2180E232A4709003BB61E /* NewsItemProtocol.swift in Sources */,
 				A5E217F723279EAA003BB61E /* ServiceProtocol.swift in Sources */,
 				A5E217FB2327BEDC003BB61E /* UIAlertControllerExtension.swift in Sources */,
 				A5E217F923279F0E003BB61E /* Service.swift in Sources */,

@@ -8,9 +8,11 @@
 
 import Foundation
 
-struct RSSItemModel {
+struct RSSItemModel: NewsItemModel {
     var title: String
+    var link: String
     var description: String
     var pubDate: String
+    var author: String
     var imageUrl: String?
 }

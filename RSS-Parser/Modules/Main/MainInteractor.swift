@@ -11,12 +11,14 @@ import Foundation
 class MainInteractor: MainInteractorProtocol {
     private let title = "New RSS"
     private let inputPlaceholder = "set url"
+    private let openUrl = "Open original"
+    private let cancel = "Cancel"
     
     weak var presenter: MainPresenterProtocol!
-    let serverService: ServiceProtocol = Service()
+    let service: ServiceProtocol = Service()
     
     var defaultTitle = "RSS Parser"
-    private var rssItems: [NewsItemModel] = []
+    private var rss: RSSModel? = nil
     
     required init(presenter: MainPresenterProtocol) {
         self.presenter = presenter
@@ -38,7 +40,7 @@ class MainInteractor: MainInteractorProtocol {
                         return
                 }
                 
-                self.rssItems = rss.items
+                self.rss = rss
                 self.presenter.endLoading()
                 self.presenter.updateHeaderInfo(title: rss.title, isEmptyList: false)
                 self.presenter.reloadData()
@@ -46,12 +48,37 @@ class MainInteractor: MainInteractorProtocol {
         }
     }
     
+    func showInfoAboutNewsStream() {
+        guard let rss = rss else { return }
+        presenter.showAlertWhenButtonClick(title: rss.title, description: rss.description, okButtonText: openUrl, cancelButtonText: cancel) { openUrl in
+            if openUrl {
+                var url = rss.link
+                while (url.last == "/") {
+                    url = String(url.dropLast())
+                }
+                self.service.openUrl(with: url)
+            }
+        }
+    }
+    
+    func deleteButtonClicked() {
+        guard rss != nil else { return }
+        presenter.showAlertWhenButtonClick(title: "", description: "Are you sure you want to delete the news feed [\(rss!.title)]?", okButtonText: "Ok", cancelButtonText: cancel) { deleteStream in
+            if deleteStream {
+                self.rss = nil
+                self.presenter.updateHeaderInfo(title: self.defaultTitle, isEmptyList: true)
+                self.presenter.showStartView()
+                self.presenter.reloadData()
+            }
+        }
+    }
+    
     func getNewsItemModel() -> [NewsItemModel] {
-        return rssItems
+        return rss?.items ?? []
     }
     
     private func getNews(with urlString: String, completion: @escaping (RSSModel?, Error?) -> Void) {
-        serverService.getNews(urlString: urlString) { rss, error in
+        service.getNews(urlString: urlString) { rss, error in
             completion(rss, error)
         }
     }

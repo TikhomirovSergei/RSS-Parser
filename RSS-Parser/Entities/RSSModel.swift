@@ -11,5 +11,6 @@ import Foundation
 struct RSSModel {
     var title: String
     var link: String
+    var description: String
     var items: [NewsItemModel]
 }

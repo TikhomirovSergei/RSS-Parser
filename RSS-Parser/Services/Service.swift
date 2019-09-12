@@ -20,6 +20,12 @@ class Service: ServiceProtocol {
         }
     }
     
+    func openUrl(with urlString: String) {
+        if let url = URL(string: urlString) {
+            UIApplication.shared.open(url, options: [:])
+        }
+    }
+    
     // MARK: - Private methods
     
     private func getRSSModel(URL: URL, completion: @escaping (RSSModel?, Error?) -> Void) {

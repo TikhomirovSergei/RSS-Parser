@@ -9,7 +9,7 @@
 import Foundation
 
 class XMLRSSParser: NSObject, XMLParserDelegate {
-    private var rss: RSSModel = RSSModel(title: "", link: "", items: [])
+    private var rss: RSSModel = RSSModel(title: "", link: "", description: "", items: [])
     private var currentElement = ""
     private var currentTitle = ""
     private var currentLink = ""
@@ -22,6 +22,8 @@ class XMLRSSParser: NSObject, XMLParserDelegate {
     private var isFirstTitleElement = true
     private var firstLinkElement = ""
     private var isFirstLinkElement = true
+    private var firstDescriptionElement = ""
+    private var isFirstDescriptionElement = true
     var parserCompletionHandler: ((RSSModel?, Error?) -> Void)?
     
     func parse(data: Data, completion: @escaping (RSSModel?, Error?) -> Void) {
@@ -63,10 +65,14 @@ class XMLRSSParser: NSObject, XMLParserDelegate {
             }}
             
         case "description": do {
-            let str = string.replacingOccurrences(of: "<[^>]+>", with: "", options: .regularExpression, range: nil)
-            currentDescription += str
-            currentImageUrl = nil
-            }
+            if isFirstDescriptionElement {
+                firstDescriptionElement += string
+                isFirstDescriptionElement = false
+            } else {
+                let str = string.replacingOccurrences(of: "<[^>]+>", with: "", options: .regularExpression, range: nil)
+                currentDescription += str
+                currentImageUrl = nil
+            }}
             
         case "pubDate": currentPubDate += string
         case "dc:creator": currentAuthor += string
@@ -85,6 +91,7 @@ class XMLRSSParser: NSObject, XMLParserDelegate {
         } else if elementName == "channel" {
             rss.title = firstTitleElement
             rss.link = firstLinkElement
+            rss.description = firstDescriptionElement
         }
     }
     

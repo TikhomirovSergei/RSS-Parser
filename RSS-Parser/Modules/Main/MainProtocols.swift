@@ -13,6 +13,7 @@ protocol MainViewProtocol: class {
     func setTitle(title: String)
     func showMenuButton()
     func showRightBarButtons()
+    func clearHeaderButtons() 
     
     func showLoadingView()
     func hideLoadingView()
@@ -20,6 +21,7 @@ protocol MainViewProtocol: class {
     func hideStartView()
     
     func setURLView(title: String, inputPlaceholder: String, completion: @escaping (_ text: String?) -> Void)
+    func showAlertWhenButtonClick(title: String, description: String, okButtonText: String, cancelButtonText: String, completion: @escaping (_ openUrl: Bool) -> Void)
     func showAlertView(with text: String)
     
     func tableBinging()
@@ -37,8 +39,11 @@ protocol MainPresenterProtocol: class {
     func showStartView()
     
     func addUrlButtonClicked()
+    func showInfoButtonClicked()
+    func deleteButtonClicked()
     
     func showSetUrlView(title: String, inputPlaceholder: String, completion: @escaping (_ text: String?) -> Void)
+    func showAlertWhenButtonClick(title: String, description: String, okButtonText: String, cancelButtonText: String, completion: @escaping (_ openUrl: Bool) -> Void)
     func getNewsItemModel() -> [NewsItemModel]
     func reloadData()
     
@@ -49,6 +54,8 @@ protocol MainInteractorProtocol: class {
     var defaultTitle: String { get }
     
     func addNewUrl()
+    func showInfoAboutNewsStream()
+    func deleteButtonClicked()
     func getNewsItemModel() -> [NewsItemModel]
 }
 

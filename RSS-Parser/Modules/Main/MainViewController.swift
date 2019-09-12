@@ -52,46 +52,26 @@ class MainViewController: UIViewController, MainViewProtocol, UITableViewDelegat
     
     // MARK: - MainViewProtocol methods
     
-    func setURLView(title: String, inputPlaceholder: String, completion: @escaping (_ text: String?) -> Void) {
-        DispatchQueue.main.async {
-            let alertController = UIAlertController(title: title, message: "", preferredStyle: .alert)
-            
-            alertController.addTextField {
-                $0.placeholder = inputPlaceholder
-                $0.text = "https://habrahabr.ru/rss/interesting/"
-                $0.addTarget(alertController, action: #selector(alertController.urlValidate), for: .editingChanged)
-            }
-            
-            let cancel = UIAlertAction(title: "Cancel", style: .cancel) { action in
-                completion(nil)
-            }
-            
-            let ok = UIAlertAction(title: "Ok", style: .default) { action in
-                
-                guard let textField = alertController.textFields?.first else {
-                    completion(nil)
-                    return
-                }
-                
-                completion(textField.text)
-            }
-            ok.isEnabled = false
-            
-            alertController.addAction(cancel)
-            alertController.addAction(ok)
-            
-            self.present(alertController, animated: true, completion: nil)
-        }
+    func setTitle(title: String) {
+        self.navigationItem.title = title
+        self.navigationItem.setHidesBackButton(true, animated:true)
     }
     
-    func showAlertView(with text: String) {
-        DispatchQueue.main.async {
-            let alertController = UIAlertController(title: "", message: text, preferredStyle: .alert)
-            alertController.addAction(UIAlertAction(title: "Ok", style: .default) { (action:UIAlertAction) in
-                
-            })
-            self.present(alertController, animated: true, completion: nil)
-        }
+    func showMenuButton() {
+        self.navigationItem.leftBarButtonItem = UIBarButtonItem(customView: _helper.createCustomButton(view: self, name: "menuIcon", selector: #selector(menuClick)))
+    }
+    
+    func showRightBarButtons() {
+        let add = UIBarButtonItem(customView: _helper.createCustomButton(view: self, name: "addIcon", selector: #selector(self.addNewRSSStreamClick)))
+        let delete = UIBarButtonItem(customView: _helper.createCustomButton(view: self, name: "deleteIcon", selector: #selector(deleteRSSStreamClick)))
+        let info = UIBarButtonItem(customView: _helper.createCustomButton(view: self, name: "infoIcon", selector: #selector(infoAboutRSSStreamClick)))
+        
+        self.navigationItem.rightBarButtonItems = [info, delete, add]
+    }
+    
+    func clearHeaderButtons() {
+        self.navigationItem.leftBarButtonItems = []
+        self.navigationItem.rightBarButtonItems = []
     }
     
     func showLoadingView() {
@@ -112,6 +92,62 @@ class MainViewController: UIViewController, MainViewProtocol, UITableViewDelegat
         emptyListView.alpha = 0
     }
     
+    func setURLView(title: String, inputPlaceholder: String, completion: @escaping (_ text: String?) -> Void) {
+        DispatchQueue.main.async {
+            let alert = UIAlertController(title: title, message: "", preferredStyle: .alert)
+            
+            alert.addTextField {
+                $0.placeholder = inputPlaceholder
+                $0.text = "https://habrahabr.ru/rss/interesting/"
+                $0.addTarget(alert, action: #selector(alert.urlValidate), for: .editingChanged)
+            }
+            
+            let cancel = UIAlertAction(title: "Cancel", style: .cancel) { action in
+                completion(nil)
+            }
+            
+            let ok = UIAlertAction(title: "Ok", style: .default) { action in
+                
+                guard let textField = alert.textFields?.first else {
+                    completion(nil)
+                    return
+                }
+                
+                completion(textField.text)
+            }
+            ok.isEnabled = false
+            
+            alert.addAction(cancel)
+            alert.addAction(ok)
+            
+            self.present(alert, animated: true, completion: nil)
+        }
+    }
+    
+    func showAlertView(with text: String) {
+        DispatchQueue.main.async {
+            let alert = UIAlertController(title: "", message: text, preferredStyle: .alert)
+            alert.addAction(UIAlertAction(title: "Ok", style: .default) { action in })
+            self.present(alert, animated: true, completion: nil)
+        }
+    }
+    
+    func showAlertWhenButtonClick(title: String, description: String, okButtonText: String, cancelButtonText: String, completion: @escaping (_ openUrl: Bool) -> Void) {
+        DispatchQueue.main.async {
+            let alert = UIAlertController(title: title, message: description, preferredStyle: .alert)
+            
+            alert.addAction(UIAlertAction(title: okButtonText, style: .default) { action in
+                completion(true)
+            })
+            
+            alert.addAction(UIAlertAction(title: cancelButtonText, style: .cancel) { action in
+                completion(false)
+            })
+            
+            self.present(alert, animated: true, completion: nil)
+        }
+    }
+    
     func tableBinging() {
         self.tableView.tableFooterView = UIView()
         self.tableView.register(UINib.init(nibName: nibFileName, bundle: nil), forCellReuseIdentifier: cellId)
@@ -119,21 +155,8 @@ class MainViewController: UIViewController, MainViewProtocol, UITableViewDelegat
         self.tableView.dataSource = self
     }
     
-    func setTitle(title: String) {
-        self.navigationItem.title = title
-        self.navigationItem.setHidesBackButton(true, animated:true)
-    }
-    
-    func showMenuButton() {
-        self.navigationItem.leftBarButtonItem = UIBarButtonItem(customView: _helper.createCustomButton(view: self, name: "menuIcon", selector: #selector(menuClick)))
-    }
-    
-    func showRightBarButtons() {
-        let add = UIBarButtonItem(customView: _helper.createCustomButton(view: self, name: "addIcon", selector: #selector(self.addNewRSSStreamClick)))
-        let delete = UIBarButtonItem(customView: _helper.createCustomButton(view: self, name: "deleteIcon", selector: #selector(deleteRSSStreamClick)))
-        let info = UIBarButtonItem(customView: _helper.createCustomButton(view: self, name: "infoIcon", selector: #selector(infoAboutRSSStreamClick)))
-        
-        self.navigationItem.rightBarButtonItems = [info, delete, add]
+    func reloadData() {
+        self.tableView.reloadData()
     }
     
     @objc func menuClick(sender: UIBarButtonItem) {
@@ -143,14 +166,11 @@ class MainViewController: UIViewController, MainViewProtocol, UITableViewDelegat
     }
     
     @objc func deleteRSSStreamClick(sender: UIBarButtonItem) {
+        presenter.deleteButtonClicked()
     }
     
     @objc func infoAboutRSSStreamClick(sender: UIBarButtonItem) {
-    }
-    
-    func reloadData() {
-        self.tableView.reloadData()
+        presenter.showInfoButtonClicked()
     }
 
 }
-

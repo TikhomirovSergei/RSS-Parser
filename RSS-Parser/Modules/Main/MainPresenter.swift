@@ -25,19 +25,13 @@ class MainPresenter: MainPresenterProtocol {
         view.tableBinging()
     }
     
-    func getNewsItemModel() -> [NewsItemModel] {
-        return interactor.getNewsItemModel()
-    }
-    
-    func addUrlButtonClicked() {
-        interactor.addNewUrl()
-    }
-    
     func updateHeaderInfo(title: String, isEmptyList: Bool) {
         self.view.setTitle(title: title)
         if !isEmptyList {
             self.view.showMenuButton()
             self.view.showRightBarButtons()
+        } else {
+            self.view.clearHeaderButtons()
         }
     }
     
@@ -54,8 +48,16 @@ class MainPresenter: MainPresenterProtocol {
         self.view.showStartView()
     }
     
-    func showError(error: Error) {
-        self.view.showAlertView(with: error.localizedDescription)
+    func addUrlButtonClicked() {
+        interactor.addNewUrl()
+    }
+    
+    func showInfoButtonClicked() {
+        interactor.showInfoAboutNewsStream()
+    }
+    
+    func deleteButtonClicked() {
+        interactor.deleteButtonClicked()
     }
     
     func showSetUrlView(title: String, inputPlaceholder: String, completion: @escaping (_ text: String?) -> Void) {
@@ -64,8 +66,22 @@ class MainPresenter: MainPresenterProtocol {
         }
     }
     
+    func showAlertWhenButtonClick(title: String, description: String, okButtonText: String, cancelButtonText: String, completion: @escaping (_ openUrl: Bool) -> Void) {
+        view.showAlertWhenButtonClick(title: title, description: description, okButtonText: okButtonText, cancelButtonText: cancelButtonText) { openUrl in
+            completion(openUrl)
+        }
+    }
+    
+    func getNewsItemModel() -> [NewsItemModel] {
+        return interactor.getNewsItemModel()
+    }
+    
     func reloadData() {
-        self.view.reloadData()        
+        self.view.reloadData()
+    }
+    
+    func showError(error: Error) {
+        self.view.showAlertView(with: error.localizedDescription)
     }
     
 }

@@ -29,23 +29,32 @@ class MainViewController: UIViewController, MainViewProtocol, UITableViewDelegat
     }
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return presenter.getNewsItemModel().count
+        return presenter.getNewsCount()
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: cellId, for: indexPath) as! NewsCell
-        let rssItems = presenter.getNewsItemModel()
-        let currentLastItem = rssItems[indexPath.row]
+        let currentLastItem = presenter.getNewsItem(index: indexPath.row) { image in
+            if image != nil {
+                cell.imageView!.image = self._helper.imageWithImage(image: image!, scaledToSize: CGSize(width: 70, height: 70))
+            }
+        }
         
         cell.selectionStyle = .none
         cell.titleLabel.text = currentLastItem.title
         cell.pubDateLabel.text = currentLastItem.pubDate
-        cell.descriptionLabel.text = currentLastItem.description
-        cell.imageView!.image = _helper.imageWithImage(image: #imageLiteral(resourceName: "news"), scaledToSize: CGSize(width: 70, height: 70))
+        cell.descriptionLabel.text = currentLastItem.desc
+        cell.imageView!.image = currentLastItem.image == nil
+            ? _helper.imageWithImage(image: #imageLiteral(resourceName: "news"), scaledToSize: CGSize(width: 70, height: 70))
+            : _helper.imageWithImage(image: currentLastItem.image!, scaledToSize: CGSize(width: 70, height: 70))
         
         return cell
     }
     
+    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        presenter.cellClicked(index: indexPath.row)
+    }
+
     @IBAction func addRSSButtonClicked(_ sender: Any) {
         presenter.addUrlButtonClicked()
     }
@@ -54,10 +63,10 @@ class MainViewController: UIViewController, MainViewProtocol, UITableViewDelegat
     
     func setTitle(title: String) {
         self.navigationItem.title = title
-        self.navigationItem.setHidesBackButton(true, animated:true)
     }
     
     func showMenuButton() {
+        self.navigationItem.setHidesBackButton(true, animated:true)
         self.navigationItem.leftBarButtonItem = UIBarButtonItem(customView: _helper.createCustomButton(view: self, name: "menuIcon", selector: #selector(menuClick)))
     }
     
@@ -70,6 +79,7 @@ class MainViewController: UIViewController, MainViewProtocol, UITableViewDelegat
     }
     
     func clearHeaderButtons() {
+        self.navigationItem.setHidesBackButton(true, animated:true)
         self.navigationItem.leftBarButtonItems = []
         self.navigationItem.rightBarButtonItems = []
     }

@@ -7,6 +7,7 @@
 //
 
 import Foundation
+import UIKit
 
 class MainInteractor: MainInteractorProtocol {
     private let title = "New RSS"
@@ -15,13 +16,34 @@ class MainInteractor: MainInteractorProtocol {
     private let cancel = "Cancel"
     
     weak var presenter: MainPresenterProtocol!
+    var router: MainRouterProtocol!
     let service: ServiceProtocol = Service()
+    let dataBase: DataBaseProtocol = DataBase()
     
     var defaultTitle = "RSS Parser"
-    private var rss: RSSModel? = nil
+    private var url: String = ""
     
     required init(presenter: MainPresenterProtocol) {
         self.presenter = presenter
+    }
+    
+    func getDefaultNewsFeed() {
+        do {
+            let newsFeeds = try dataBase.getNewsFeeds()
+            if newsFeeds.count > 0 {
+                url = newsFeeds[0].url
+                self.presenter.endLoading()
+                self.presenter.hideStartView()
+                self.presenter.updateHeaderInfo(title: newsFeeds[0].title, isEmptyList: false)
+            } else {
+                self.presenter.showStartView()
+                self.presenter.updateHeaderInfo(title: defaultTitle, isEmptyList: true)
+            }
+        } catch {
+            self.presenter.showStartView()
+            presenter.showError(error: error)
+            self.presenter.updateHeaderInfo(title: defaultTitle, isEmptyList: true)
+        }
     }
     
     func addNewUrl() {
@@ -32,7 +54,8 @@ class MainInteractor: MainInteractorProtocol {
             }
             
             self.presenter.startLoading()
-            self.getNews(with: textUrl) { rss, error in
+            self.presenter.hideStartView()
+            self.service.getNews(urlString: textUrl) { rss, error in
                 guard let rss = rss,
                     error == nil else {
                         self.presenter.endLoading()
@@ -40,46 +63,131 @@ class MainInteractor: MainInteractorProtocol {
                         return
                 }
                 
-                self.rss = rss
-                self.presenter.endLoading()
-                self.presenter.updateHeaderInfo(title: rss.title, isEmptyList: false)
-                self.presenter.reloadData()
+                do {
+                    try self.dataBase.saveNewsFeed(newsFeed: rss)
+                    self.url = textUrl
+                    
+                    self.presenter.endLoading()
+                    self.presenter.updateHeaderInfo(title: rss.title, isEmptyList: false)
+                    self.presenter.reloadData()
+                } catch {
+                    
+                }
             }
         }
     }
     
     func showInfoAboutNewsStream() {
-        guard let rss = rss else { return }
-        presenter.showAlertWhenButtonClick(title: rss.title, description: rss.description, okButtonText: openUrl, cancelButtonText: cancel) { openUrl in
-            if openUrl {
-                var url = rss.link
-                while (url.last == "/") {
-                    url = String(url.dropLast())
-                }
-                self.service.openUrl(with: url)
+        do {
+            var newsFeed = try self.dataBase.getNewsFeed(url: url)
+            if newsFeed.url == "" {
+                presenter.showError(error: "news feed is empty")
             }
+            
+            presenter.showAlertWhenButtonClick(title: newsFeed.title, description: newsFeed.desc, okButtonText: openUrl, cancelButtonText: cancel) { openUrl in
+                if openUrl {
+                    var url = newsFeed.link
+                    while (url.last == "/") {
+                        url = String(url.dropLast())
+                    }
+                    self.service.openUrl(with: url)
+                }
+            }
+        } catch {
+            presenter.showError(error: error)
         }
     }
     
     func deleteButtonClicked() {
-        guard rss != nil else { return }
-        presenter.showAlertWhenButtonClick(title: "", description: "Are you sure you want to delete the news feed [\(rss!.title)]?", okButtonText: "Ok", cancelButtonText: cancel) { deleteStream in
-            if deleteStream {
-                self.rss = nil
-                self.presenter.updateHeaderInfo(title: self.defaultTitle, isEmptyList: true)
-                self.presenter.showStartView()
-                self.presenter.reloadData()
+        do {
+            var newsFeed = try self.dataBase.getNewsFeed(url: url)
+            if newsFeed.url == "" {
+                presenter.showError(error: "news feed is empty")
             }
+            
+            presenter.showAlertWhenButtonClick(title: "", description: "Are you sure you want to delete the news feed [\(newsFeed.title)]?", okButtonText: "Ok", cancelButtonText: cancel) { deleteStream in
+                if deleteStream {
+                    do {
+                        try self.dataBase.deleteNewsFeed(url: newsFeed.url)
+                        self.getDefaultNewsFeed()
+                        self.presenter.reloadData()
+                    } catch {
+                        self.presenter.showError(error: error)
+                    }
+                }
+            }
+        } catch {
+            presenter.showError(error: error)
         }
     }
     
-    func getNewsItemModel() -> [NewsItemModel] {
-        return rss?.items ?? []
-    }
-    
-    private func getNews(with urlString: String, completion: @escaping (RSSModel?, Error?) -> Void) {
-        service.getNews(urlString: urlString) { rss, error in
-            completion(rss, error)
+    func cellClicked(index: Int) {
+        do {
+            var newsFeed = try self.dataBase.getNewsFeed(url: url)
+            if newsFeed.url == "" {
+                presenter.showError(error: "news feed is empty")
+            }
+            router.showNewsDetailsViewController(newsItem: newsFeed.news[index])
+        } catch {
+            presenter.showError(error: error)
         }
     }
+    
+    func getNewsCount() -> Int {
+        do {
+            var newsFeed = try self.dataBase.getNewsFeed(url: url)
+            if newsFeed.url == "" {
+               return 0
+            } else {
+                return newsFeed.news.count
+            }
+        } catch {
+            presenter.showError(error: error)
+            return 0
+        }
+    }
+    
+    func getNewsItem(index: Int, completion: @escaping (_ image: UIImage?) -> Void) -> NewsModelProtocol {
+        var model = NewsModel(title: "", link: "", desc: "", pubDate: "", author: "", image: nil)
+        
+        do {
+            var newsFeed = try self.dataBase.getNewsFeed(url: url)
+            let item = newsFeed.news[index]
+            var description = item.desc.replacingOccurrences(of: "<[^>]+>", with: "", options: .regularExpression, range: nil)
+            description = description.replacingOccurrences(of: "\n", with: "", options: NSString.CompareOptions.literal, range:nil)
+            description = description.replacingOccurrences(of: "\r", with: "", options: NSString.CompareOptions.literal, range:nil)
+            
+            if newsFeed.news[index].image == nil {
+                service.loadImage(attributedString: item.desc) { image, error in
+                    guard let image = image else {
+                        completion(nil)
+                        return
+                    }
+                    
+                    do {
+                        let newsModel = NewsModel(title: item.title, link: item.link, desc: item.desc, pubDate: item.pubDate, author: item.author, image: image)
+                        try self.dataBase.updateNews(news: newsModel)
+                    } catch {
+                        self.presenter.showError(error: error)
+                    }
+                    
+                    completion(image)
+                }
+            } else {
+                completion(nil)
+            }
+            
+            model.title = item.title
+            model.link = item.link
+            model.desc = description
+            model.pubDate = item.pubDate
+            model.author = item.author
+            model.image = item.image
+        } catch {
+            presenter.showError(error: error)
+        }
+        
+        return model
+    }
+    
 }

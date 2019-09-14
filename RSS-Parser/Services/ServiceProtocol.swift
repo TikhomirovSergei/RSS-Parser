@@ -7,8 +7,10 @@
 //
 
 import Foundation
+import UIKit
 
 protocol ServiceProtocol: class {
-    func getNews(urlString: String, completion: @escaping (RSSModel?, Error?) -> Void)
+    func getNews(urlString: String, completion: @escaping (NewsFeedModel?, Error?) -> Void)
     func openUrl(with urlString: String)
+    func loadImage(attributedString: String, completion: @escaping (_ image: UIImage?, _ error: Error?) -> Void)
 }

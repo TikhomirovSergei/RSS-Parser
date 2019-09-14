@@ -1,5 +1,5 @@
 //
-//  RSSModel.swift
+//  NewsModel.swift
 //  RSS-Parser
 //
 //  Created by Сергей on 11/09/2019.
@@ -7,10 +7,13 @@
 //
 
 import Foundation
+import UIKit
 
-struct RSSModel {
+struct NewsModel: NewsModelProtocol {
     var title: String
     var link: String
-    var description: String
-    var items: [NewsItemModel]
+    var desc: String
+    var pubDate: String
+    var author: String
+    var image: UIImage?
 }

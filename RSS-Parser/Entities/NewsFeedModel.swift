@@ -1,5 +1,5 @@
 //
-//  RSSItemModel.swift
+//  NewsFeedModel.swift
 //  RSS-Parser
 //
 //  Created by Сергей on 11/09/2019.
@@ -8,11 +8,10 @@
 
 import Foundation
 
-struct RSSItemModel: NewsItemModel {
+struct NewsFeedModel: NewsFeedModelProtocol {
+    var url: String
     var title: String
     var link: String
-    var description: String
-    var pubDate: String
-    var author: String
-    var imageUrl: String?
+    var desc: String
+    var news: [NewsModelProtocol]
 }

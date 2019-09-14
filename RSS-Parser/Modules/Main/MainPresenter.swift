@@ -12,7 +12,6 @@ import UIKit
 class MainPresenter: MainPresenterProtocol {
     weak var view: MainViewProtocol!
     var interactor: MainInteractorProtocol!
-    var router: MainRouterProtocol!
     
     required init(view: MainViewProtocol) {
         self.view = view
@@ -21,8 +20,8 @@ class MainPresenter: MainPresenterProtocol {
     // MARK: - MainPresenterProtocol methods
     
     func configureView() {
-        self.view.setTitle(title: interactor.defaultTitle)
         view.tableBinging()
+        interactor.getDefaultNewsFeed()
     }
     
     func updateHeaderInfo(title: String, isEmptyList: Bool) {
@@ -36,12 +35,15 @@ class MainPresenter: MainPresenterProtocol {
     }
     
     func startLoading() {
-        self.view.hideStartView()
         self.view.showLoadingView()
     }
     
     func endLoading() {
         self.view.hideLoadingView()
+    }
+    
+    func hideStartView() {
+        self.view.hideStartView()
     }
     
     func showStartView() {
@@ -60,6 +62,10 @@ class MainPresenter: MainPresenterProtocol {
         interactor.deleteButtonClicked()
     }
     
+    func cellClicked(index: Int) {
+        interactor.cellClicked(index: index)
+    }
+    
     func showSetUrlView(title: String, inputPlaceholder: String, completion: @escaping (_ text: String?) -> Void) {
         view.setURLView(title: title, inputPlaceholder: inputPlaceholder) { text in
             completion(text)
@@ -72,8 +78,14 @@ class MainPresenter: MainPresenterProtocol {
         }
     }
     
-    func getNewsItemModel() -> [NewsItemModel] {
-        return interactor.getNewsItemModel()
+    func getNewsCount() -> Int {
+        return interactor.getNewsCount()
+    }
+    
+    func getNewsItem(index: Int, completion: @escaping (_ image: UIImage?) -> Void) -> NewsModelProtocol {
+        return interactor.getNewsItem(index: index) { image in
+            completion(image)
+        }
     }
     
     func reloadData() {

@@ -7,16 +7,16 @@
 //
 
 import Foundation
+import UIKit
 
 class XMLRSSParser: NSObject, XMLParserDelegate {
-    private var rss: RSSModel = RSSModel(title: "", link: "", description: "", items: [])
+    private var rss: NewsFeedModel = NewsFeedModel(url: "", title: "", link: "", desc: "", news: [])
     private var currentElement = ""
     private var currentTitle = ""
     private var currentLink = ""
     private var currentDescription = ""
     private var currentPubDate = ""
     private var currentAuthor = ""
-    private var currentImageUrl: String? = nil
     
     private var firstTitleElement = ""
     private var isFirstTitleElement = true
@@ -24,9 +24,13 @@ class XMLRSSParser: NSObject, XMLParserDelegate {
     private var isFirstLinkElement = true
     private var firstDescriptionElement = ""
     private var isFirstDescriptionElement = true
-    var parserCompletionHandler: ((RSSModel?, Error?) -> Void)?
+    var parserCompletionHandler: ((NewsFeedModel?, Error?) -> Void)?
     
-    func parse(data: Data, completion: @escaping (RSSModel?, Error?) -> Void) {
+    init(url: String) {
+        self.rss.url = url
+    }
+    
+    func parse(data: Data, completion: @escaping (NewsFeedModel?, Error?) -> Void) {
         parserCompletionHandler = completion
         let parser = XMLParser(data: data)
         parser.delegate = self
@@ -42,7 +46,6 @@ class XMLRSSParser: NSObject, XMLParserDelegate {
             currentDescription = ""
             currentPubDate = ""
             currentAuthor = ""
-            currentImageUrl = nil
         }
     }
     
@@ -69,9 +72,8 @@ class XMLRSSParser: NSObject, XMLParserDelegate {
                 firstDescriptionElement += string
                 isFirstDescriptionElement = false
             } else {
-                let str = string.replacingOccurrences(of: "<[^>]+>", with: "", options: .regularExpression, range: nil)
-                currentDescription += str
-                currentImageUrl = nil
+                //let str = string.replacingOccurrences(of: "<[^>]+>", with: "", options: .regularExpression, range: nil)
+                currentDescription += string
             }}
             
         case "pubDate": currentPubDate += string
@@ -82,16 +84,16 @@ class XMLRSSParser: NSObject, XMLParserDelegate {
     
     func parser(_ parser: XMLParser, didEndElement elementName: String, namespaceURI: String?, qualifiedName qName: String?) {
         if elementName == "item" {
-            let rssItem = RSSItemModel(
+            let rssItem = NewsModel(
                 title: currentTitle, link: currentLink,
-                description: currentDescription, pubDate: currentPubDate,
-                author: currentAuthor, imageUrl: currentImageUrl)
+                desc: currentDescription, pubDate: currentPubDate,
+                author: currentAuthor, image: nil)
             
-            rss.items += [rssItem]
+            rss.news += [rssItem]
         } else if elementName == "channel" {
             rss.title = firstTitleElement
             rss.link = firstLinkElement
-            rss.description = firstDescriptionElement
+            rss.desc = firstDescriptionElement
         }
     }
     

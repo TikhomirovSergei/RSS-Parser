@@ -18,7 +18,7 @@ class MainConfigurator: MainConfiguratorProtocol {
         
         viewController.presenter = presenter
         presenter.interactor = interactor
-        presenter.router = router
+        interactor.router = router
     }
     
 }

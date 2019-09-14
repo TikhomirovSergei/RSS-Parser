@@ -25,6 +25,8 @@ protocol MainViewProtocol: class {
     func showAlertView(with text: String)
     
     func tableBinging()
+    func addRefreshView()
+    func endRefreshing()
     func reloadData()
 }
 
@@ -46,6 +48,8 @@ protocol MainPresenterProtocol: class {
     func showAlertWhenButtonClick(title: String, description: String, okButtonText: String, cancelButtonText: String, completion: @escaping (_ openUrl: Bool) -> Void)
     func getNewsCount() -> Int
     func getNewsItem(index: Int, completion: @escaping (_ image: UIImage?) -> Void) -> NewsModelProtocol
+    func refreshData()
+    func endRefreshing()
     func reloadData()
     
     func showError(error: Error)
@@ -55,6 +59,7 @@ protocol MainInteractorProtocol: class {
     var defaultTitle: String { get }
     
     func getDefaultNewsFeed()
+    func refreshData()
     func addNewUrl()
     func showInfoAboutNewsStream()
     func deleteButtonClicked()

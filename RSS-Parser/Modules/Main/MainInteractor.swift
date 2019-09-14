@@ -22,6 +22,7 @@ class MainInteractor: MainInteractorProtocol {
     
     var defaultTitle = "RSS Parser"
     private var url: String = ""
+    private var refreshTime = Date()
     
     required init(presenter: MainPresenterProtocol) {
         self.presenter = presenter
@@ -46,6 +47,32 @@ class MainInteractor: MainInteractorProtocol {
         }
     }
     
+    func refreshData() {
+        let diff = Int(Date().timeIntervalSince1970 - refreshTime.timeIntervalSince1970)
+        if diff >= 60 {
+            refreshTime = Date()
+            self.service.getNews(urlString: url) { rss, error in
+                guard let rss = rss,
+                    error == nil else {
+                        self.presenter.showError(error: error!)
+                        self.presenter.endRefreshing()
+                        return
+                }
+                
+                do {
+                    try self.dataBase.saveNewsFeed(newsFeed: rss)
+                    self.presenter.endRefreshing()
+                    self.presenter.reloadData()
+                } catch {
+                    self.presenter.endRefreshing()
+                    self.presenter.showError(error: error)
+                }
+            }
+        } else {
+            self.presenter.endRefreshing()
+        }
+    }
+    
     func addNewUrl() {
         presenter.showSetUrlView(title: title, inputPlaceholder: inputPlaceholder) { textUrl in
             guard let textUrl = textUrl else {
@@ -53,12 +80,15 @@ class MainInteractor: MainInteractorProtocol {
                 return
             }
             
-            self.presenter.startLoading()
-            self.presenter.hideStartView()
+            if self.url == "" {
+                self.presenter.startLoading()
+                self.presenter.hideStartView()
+            }
             self.service.getNews(urlString: textUrl) { rss, error in
                 guard let rss = rss,
                     error == nil else {
                         self.presenter.endLoading()
+                        self.url == "" ? self.presenter.showStartView() : nil
                         self.presenter.showError(error: error!)
                         return
                 }
@@ -71,7 +101,9 @@ class MainInteractor: MainInteractorProtocol {
                     self.presenter.updateHeaderInfo(title: rss.title, isEmptyList: false)
                     self.presenter.reloadData()
                 } catch {
-                    
+                    self.presenter.endLoading()
+                    self.url == "" ? self.presenter.showStartView() : nil
+                    self.presenter.showError(error: error)
                 }
             }
         }

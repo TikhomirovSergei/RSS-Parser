@@ -15,6 +15,8 @@ class MainViewController: UIViewController, MainViewProtocol, UITableViewDelegat
     
     var presenter: MainPresenterProtocol!
     let configurator: MainConfiguratorProtocol = MainConfigurator()
+    
+    private let refreshControl = UIRefreshControl()
 
     @IBOutlet weak var tableView: UITableView!
     @IBOutlet weak var activityIndicator: UIActivityIndicatorView!
@@ -165,6 +167,20 @@ class MainViewController: UIViewController, MainViewProtocol, UITableViewDelegat
         self.tableView.dataSource = self
     }
     
+    func addRefreshView() {
+        if #available(iOS 10.0, *) {
+            tableView.refreshControl = refreshControl
+        } else {
+            tableView.addSubview(refreshControl)
+        }
+        
+        refreshControl.addTarget(self, action: #selector(refreshData(_:)), for: .valueChanged)
+    }
+    
+    func endRefreshing() {
+        self.refreshControl.endRefreshing()
+    }
+    
     func reloadData() {
         self.tableView.reloadData()
     }
@@ -181,6 +197,10 @@ class MainViewController: UIViewController, MainViewProtocol, UITableViewDelegat
     
     @objc func infoAboutRSSStreamClick(sender: UIBarButtonItem) {
         presenter.showInfoButtonClicked()
+    }
+    
+    @objc private func refreshData(_ sender: Any) {
+        presenter.refreshData()
     }
 
 }

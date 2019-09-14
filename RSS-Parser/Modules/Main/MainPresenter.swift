@@ -21,6 +21,7 @@ class MainPresenter: MainPresenterProtocol {
     
     func configureView() {
         view.tableBinging()
+        view.addRefreshView()
         interactor.getDefaultNewsFeed()
     }
     
@@ -86,6 +87,14 @@ class MainPresenter: MainPresenterProtocol {
         return interactor.getNewsItem(index: index) { image in
             completion(image)
         }
+    }
+    
+    func refreshData() {
+        interactor.refreshData()
+    }
+    
+    func endRefreshing() {
+        self.view.endRefreshing()
     }
     
     func reloadData() {

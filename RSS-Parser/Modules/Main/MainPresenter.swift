@@ -20,6 +20,7 @@ class MainPresenter: MainPresenterProtocol {
     // MARK: - MainPresenterProtocol methods
     
     func configureView() {
+        view.hideSideMenu()
         view.tableBinging()
         view.addRefreshView()
         interactor.getDefaultNewsFeed()
@@ -49,6 +50,18 @@ class MainPresenter: MainPresenterProtocol {
     
     func showStartView() {
         self.view.showStartView()
+    }
+    
+    func showSideMenu() {
+        self.view.showSideMenu()
+    }
+    
+    func hideSideMenu() {
+        self.view.hideSideMenu()
+    }
+    
+    func menuClicked() {
+        interactor.menuClicked()
     }
     
     func addUrlButtonClicked() {

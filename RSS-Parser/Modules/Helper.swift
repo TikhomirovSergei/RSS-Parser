@@ -12,8 +12,8 @@ import UIKit
 class Helper {
     
     func createCustomButton(view: UIViewController, name: String, selector: Selector) -> UIButton {
-        let button = UIButton(frame: CGRect(x: 0, y: 0, width: 24, height: 24))
-        var img = self.imageWithImage(image: UIImage(named: name)!, scaledToSize: CGSize(width: 24, height: 24))
+        let button = UIButton(frame: CGRect(x: 0, y: 0, width: 26, height: 26))
+        var img = self.imageWithImage(image: UIImage(named: name)!, scaledToSize: CGSize(width: 26, height: 26))
         img = img.withRenderingMode(.alwaysTemplate)
         button.setImage(img, for: .normal)
         button.titleLabel?.font = UIFont.boldSystemFont(ofSize: 18)

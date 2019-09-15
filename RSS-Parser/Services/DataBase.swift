@@ -11,6 +11,8 @@ import UIKit
 import CoreData
 
 class DataBase: DataBaseProtocol {
+    private static var selectedUrl = ""
+    private static var menuIsOpen = false
     private static var selectedNews: NewsModelProtocol? = nil
     let lock = NSLock()
     
@@ -20,6 +22,22 @@ class DataBase: DataBaseProtocol {
     
     func getSelectedNews() -> NewsModelProtocol? {
         return DataBase.selectedNews
+    }
+    
+    func setSelectedUrl(selectedUrl: String) {
+        DataBase.selectedUrl = selectedUrl
+    }
+    
+    func getSelectedUrl() -> String {
+        return DataBase.selectedUrl
+    }
+    
+    func setMenuIsOpen(menuIsOpen: Bool) {
+        DataBase.menuIsOpen = menuIsOpen
+    }
+    
+    func getMenuIsOpen() -> Bool {
+        return DataBase.menuIsOpen
     }
     
     func saveNewsFeed(newsFeed: NewsFeedModelProtocol) throws {

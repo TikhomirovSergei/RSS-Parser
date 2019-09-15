@@ -18,6 +18,7 @@ class MainViewController: UIViewController, MainViewProtocol, UITableViewDelegat
     
     private let refreshControl = UIRefreshControl()
 
+    @IBOutlet var sideMenu: UIView!
     @IBOutlet weak var tableView: UITableView!
     @IBOutlet weak var activityIndicator: UIActivityIndicatorView!
     @IBOutlet weak var emptyListView: UIView!
@@ -28,6 +29,10 @@ class MainViewController: UIViewController, MainViewProtocol, UITableViewDelegat
         super.viewDidLoad()
         configurator.configure(with: self)
         presenter.configureView()
+        
+        sideMenu.layer.borderWidth = 0.3
+        sideMenu.layer.borderColor = UIColor.black.cgColor
+        
     }
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
@@ -102,6 +107,18 @@ class MainViewController: UIViewController, MainViewProtocol, UITableViewDelegat
     
     func hideStartView() {
         emptyListView.alpha = 0
+    }
+    
+    func showSideMenu() {
+        UIView.animate(withDuration: 0.5) {
+            self.sideMenu.alpha = 1
+        }
+    }
+    
+    func hideSideMenu() {
+        UIView.animate(withDuration: 0.5) {
+            self.sideMenu.alpha = 0
+        }
     }
     
     func setURLView(title: String, inputPlaceholder: String, completion: @escaping (_ text: String?) -> Void) {
@@ -186,9 +203,11 @@ class MainViewController: UIViewController, MainViewProtocol, UITableViewDelegat
     }
     
     @objc func menuClick(sender: UIBarButtonItem) {
+        presenter.menuClicked()
     }
     
     @objc func addNewRSSStreamClick(sender: UIBarButtonItem) {
+        presenter.addUrlButtonClicked()
     }
     
     @objc func deleteRSSStreamClick(sender: UIBarButtonItem) {

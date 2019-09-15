@@ -40,6 +40,14 @@
 		A5E21824232C38C8003BB61E /* EntitiesProtocols.swift in Sources */ = {isa = PBXBuildFile; fileRef = A5E21823232C38C8003BB61E /* EntitiesProtocols.swift */; };
 		A5E21826232CC6FA003BB61E /* DataBaseProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = A5E21825232CC6FA003BB61E /* DataBaseProtocol.swift */; };
 		A5E21828232CCB65003BB61E /* NSErrorExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = A5E21827232CCB65003BB61E /* NSErrorExtension.swift */; };
+		A5E2182B232E4870003BB61E /* MenuViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = A5E2182A232E4870003BB61E /* MenuViewController.swift */; };
+		A5E2182E232E55A5003BB61E /* MenuCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = A5E2182C232E55A5003BB61E /* MenuCell.swift */; };
+		A5E2182F232E55A5003BB61E /* MenuCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = A5E2182D232E55A5003BB61E /* MenuCell.xib */; };
+		A5E21831232E57D5003BB61E /* MenuProtocols.swift in Sources */ = {isa = PBXBuildFile; fileRef = A5E21830232E57D5003BB61E /* MenuProtocols.swift */; };
+		A5E21833232E57F7003BB61E /* MenuConfigurator.swift in Sources */ = {isa = PBXBuildFile; fileRef = A5E21832232E57F7003BB61E /* MenuConfigurator.swift */; };
+		A5E21835232E581E003BB61E /* MenuPresenter.swift in Sources */ = {isa = PBXBuildFile; fileRef = A5E21834232E581E003BB61E /* MenuPresenter.swift */; };
+		A5E21837232E5836003BB61E /* MenuInteractor.swift in Sources */ = {isa = PBXBuildFile; fileRef = A5E21836232E5836003BB61E /* MenuInteractor.swift */; };
+		A5E21839232E5849003BB61E /* MenuRouter.swift in Sources */ = {isa = PBXBuildFile; fileRef = A5E21838232E5849003BB61E /* MenuRouter.swift */; };
 		F6DD54EE6275258D52A92740 /* Pods_RSS_ParserTests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5191B426E00F302500B324E9 /* Pods_RSS_ParserTests.framework */; };
 /* End PBXBuildFile section */
 
@@ -95,6 +103,14 @@
 		A5E21823232C38C8003BB61E /* EntitiesProtocols.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EntitiesProtocols.swift; sourceTree = "<group>"; };
 		A5E21825232CC6FA003BB61E /* DataBaseProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataBaseProtocol.swift; sourceTree = "<group>"; };
 		A5E21827232CCB65003BB61E /* NSErrorExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NSErrorExtension.swift; sourceTree = "<group>"; };
+		A5E2182A232E4870003BB61E /* MenuViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MenuViewController.swift; sourceTree = "<group>"; };
+		A5E2182C232E55A5003BB61E /* MenuCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MenuCell.swift; sourceTree = "<group>"; };
+		A5E2182D232E55A5003BB61E /* MenuCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = MenuCell.xib; sourceTree = "<group>"; };
+		A5E21830232E57D5003BB61E /* MenuProtocols.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MenuProtocols.swift; sourceTree = "<group>"; };
+		A5E21832232E57F7003BB61E /* MenuConfigurator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MenuConfigurator.swift; sourceTree = "<group>"; };
+		A5E21834232E581E003BB61E /* MenuPresenter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MenuPresenter.swift; sourceTree = "<group>"; };
+		A5E21836232E5836003BB61E /* MenuInteractor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MenuInteractor.swift; sourceTree = "<group>"; };
+		A5E21838232E5849003BB61E /* MenuRouter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MenuRouter.swift; sourceTree = "<group>"; };
 		F3BBD66BEFFF56F56098EB7E /* Pods-RSS-ParserTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-RSS-ParserTests.debug.xcconfig"; path = "Target Support Files/Pods-RSS-ParserTests/Pods-RSS-ParserTests.debug.xcconfig"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -194,6 +210,7 @@
 		A5E217E9232790A9003BB61E /* Modules */ = {
 			isa = PBXGroup;
 			children = (
+				A5E21829232E484F003BB61E /* Menu */,
 				A5E2180F232A5910003BB61E /* NewsDetails */,
 				A5E217EB23279AD1003BB61E /* Main */,
 				A5E2180B23298FFD003BB61E /* Helper.swift */,
@@ -234,6 +251,8 @@
 				A5E217C823278EE8003BB61E /* Main.storyboard */,
 				A5E218012328119F003BB61E /* NewsCell.swift */,
 				A5E218022328119F003BB61E /* NewsCell.xib */,
+				A5E2182C232E55A5003BB61E /* MenuCell.swift */,
+				A5E2182D232E55A5003BB61E /* MenuCell.xib */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -241,14 +260,27 @@
 		A5E2180F232A5910003BB61E /* NewsDetails */ = {
 			isa = PBXGroup;
 			children = (
-				A5E21810232A5A85003BB61E /* NewsDetailsViewController.swift */,
 				A5E21814232ABA16003BB61E /* NewsDetailsProtocols.swift */,
 				A5E21816232ABA85003BB61E /* NewsDetailsConfigurator.swift */,
+				A5E21810232A5A85003BB61E /* NewsDetailsViewController.swift */,
 				A5E21818232ABA96003BB61E /* NewsDetailsPresenter.swift */,
 				A5E2181A232ABAA8003BB61E /* NewsDetailsInteractor.swift */,
 				A5E2181C232ABABB003BB61E /* NewsDetailsRouter.swift */,
 			);
 			path = NewsDetails;
+			sourceTree = "<group>";
+		};
+		A5E21829232E484F003BB61E /* Menu */ = {
+			isa = PBXGroup;
+			children = (
+				A5E21830232E57D5003BB61E /* MenuProtocols.swift */,
+				A5E21832232E57F7003BB61E /* MenuConfigurator.swift */,
+				A5E2182A232E4870003BB61E /* MenuViewController.swift */,
+				A5E21834232E581E003BB61E /* MenuPresenter.swift */,
+				A5E21836232E5836003BB61E /* MenuInteractor.swift */,
+				A5E21838232E5849003BB61E /* MenuRouter.swift */,
+			);
+			path = Menu;
 			sourceTree = "<group>";
 		};
 		ADAD76DB1D8D83672A7D20AD /* Pods */ = {
@@ -346,6 +378,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				A5E2182F232E55A5003BB61E /* MenuCell.xib in Resources */,
 				A5E217D223278EF3003BB61E /* LaunchScreen.storyboard in Resources */,
 				A5E218042328119F003BB61E /* NewsCell.xib in Resources */,
 				A5E217CF23278EF3003BB61E /* Assets.xcassets in Resources */,
@@ -445,12 +478,16 @@
 				A5E21824232C38C8003BB61E /* EntitiesProtocols.swift in Sources */,
 				A5E21826232CC6FA003BB61E /* DataBaseProtocol.swift in Sources */,
 				A5E217F123279D36003BB61E /* MainPresenter.swift in Sources */,
+				A5E21839232E5849003BB61E /* MenuRouter.swift in Sources */,
 				A5E217C723278EE8003BB61E /* MainViewController.swift in Sources */,
+				A5E21835232E581E003BB61E /* MenuPresenter.swift in Sources */,
 				A5E21812232A5A85003BB61E /* NewsDetailsViewController.swift in Sources */,
 				A5E217CD23278EE8003BB61E /* RSS_Parser.xcdatamodeld in Sources */,
 				A5E2180C23298FFD003BB61E /* Helper.swift in Sources */,
 				A5E21819232ABA97003BB61E /* NewsDetailsPresenter.swift in Sources */,
 				A5E21828232CCB65003BB61E /* NSErrorExtension.swift in Sources */,
+				A5E2182E232E55A5003BB61E /* MenuCell.swift in Sources */,
+				A5E21831232E57D5003BB61E /* MenuProtocols.swift in Sources */,
 				A5E21817232ABA85003BB61E /* NewsDetailsConfigurator.swift in Sources */,
 				A5E218032328119F003BB61E /* NewsCell.swift in Sources */,
 				A5E217C523278EE8003BB61E /* AppDelegate.swift in Sources */,
@@ -459,10 +496,13 @@
 				A5E217FB2327BEDC003BB61E /* UIAlertControllerExtension.swift in Sources */,
 				A5E217F923279F0E003BB61E /* Service.swift in Sources */,
 				A5E21808232983B7003BB61E /* XMLRSSParser.swift in Sources */,
+				A5E2182B232E4870003BB61E /* MenuViewController.swift in Sources */,
 				A5E2181D232ABABB003BB61E /* NewsDetailsRouter.swift in Sources */,
 				A5E217F323279D90003BB61E /* MainInteractor.swift in Sources */,
 				A5E21822232C32B9003BB61E /* DataBase.swift in Sources */,
 				A5E217EF23279B3C003BB61E /* MainConfigurator.swift in Sources */,
+				A5E21833232E57F7003BB61E /* MenuConfigurator.swift in Sources */,
+				A5E21837232E5836003BB61E /* MenuInteractor.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

@@ -19,6 +19,8 @@ protocol MainViewProtocol: class {
     func hideLoadingView()
     func showStartView()
     func hideStartView()
+    func showSideMenu()
+    func hideSideMenu()
     
     func setURLView(title: String, inputPlaceholder: String, completion: @escaping (_ text: String?) -> Void)
     func showAlertWhenButtonClick(title: String, description: String, okButtonText: String, cancelButtonText: String, completion: @escaping (_ openUrl: Bool) -> Void)
@@ -38,7 +40,10 @@ protocol MainPresenterProtocol: class {
     func endLoading()
     func hideStartView()
     func showStartView()
+    func showSideMenu()
+    func hideSideMenu()
     
+    func menuClicked()
     func addUrlButtonClicked()
     func showInfoButtonClicked()
     func deleteButtonClicked()
@@ -60,6 +65,7 @@ protocol MainInteractorProtocol: class {
     
     func getDefaultNewsFeed()
     func refreshData()
+    func menuClicked()
     func addNewUrl()
     func showInfoAboutNewsStream()
     func deleteButtonClicked()

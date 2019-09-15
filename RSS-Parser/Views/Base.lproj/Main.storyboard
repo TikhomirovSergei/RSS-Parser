@@ -59,14 +59,26 @@
                                     <constraint firstAttribute="height" constant="120" id="mGy-6p-Jvq"/>
                                 </constraints>
                             </view>
+                            <containerView opaque="NO" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="snd-mF-Z6I">
+                                <rect key="frame" x="0.0" y="0.0" width="240" height="808"/>
+                                <constraints>
+                                    <constraint firstAttribute="width" constant="240" id="KQt-6k-xLj"/>
+                                </constraints>
+                                <connections>
+                                    <segue destination="7h4-SP-dJK" kind="embed" id="UeK-Cj-B7g"/>
+                                </connections>
+                            </containerView>
                         </subviews>
                         <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                         <constraints>
                             <constraint firstItem="Vst-aN-ehV" firstAttribute="centerY" secondItem="8bC-Xf-vdC" secondAttribute="centerY" id="6jY-WV-7qM"/>
+                            <constraint firstAttribute="bottom" secondItem="snd-mF-Z6I" secondAttribute="bottom" id="A0Q-wK-AMG"/>
                             <constraint firstItem="Vst-aN-ehV" firstAttribute="centerX" secondItem="8bC-Xf-vdC" secondAttribute="centerX" id="BNw-uB-NBx"/>
                             <constraint firstItem="51C-2H-pgK" firstAttribute="leading" secondItem="6Tk-OE-BBY" secondAttribute="leading" id="FWt-mc-UQW"/>
+                            <constraint firstItem="snd-mF-Z6I" firstAttribute="top" secondItem="6Tk-OE-BBY" secondAttribute="top" id="Ito-Ih-E1c"/>
                             <constraint firstItem="Sw7-ZW-Hdf" firstAttribute="centerX" secondItem="8bC-Xf-vdC" secondAttribute="centerX" id="J6t-I8-CMg"/>
                             <constraint firstItem="6Tk-OE-BBY" firstAttribute="bottom" secondItem="51C-2H-pgK" secondAttribute="bottom" id="KgD-jd-tPD"/>
+                            <constraint firstItem="snd-mF-Z6I" firstAttribute="leading" secondItem="6Tk-OE-BBY" secondAttribute="leading" id="Ym5-xf-jos"/>
                             <constraint firstItem="6Tk-OE-BBY" firstAttribute="trailing" secondItem="51C-2H-pgK" secondAttribute="trailing" id="hxS-cc-bSV"/>
                             <constraint firstItem="Sw7-ZW-Hdf" firstAttribute="centerY" secondItem="8bC-Xf-vdC" secondAttribute="centerY" id="ljM-OD-Rhh"/>
                             <constraint firstItem="51C-2H-pgK" firstAttribute="top" secondItem="6Tk-OE-BBY" secondAttribute="top" id="up7-AP-Coh"/>
@@ -80,12 +92,35 @@
                         <outlet property="addRSSButton" destination="7j2-Nq-sEc" id="fNz-Dz-snB"/>
                         <outlet property="emptyListLabel" destination="3uI-oh-FVr" id="e3I-YE-gr8"/>
                         <outlet property="emptyListView" destination="Sw7-ZW-Hdf" id="CLC-oE-Lle"/>
+                        <outlet property="sideMenu" destination="snd-mF-Z6I" id="1Jm-5Q-k32"/>
                         <outlet property="tableView" destination="51C-2H-pgK" id="cpY-Vx-htf"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="dkx-z0-nzr" sceneMemberID="firstResponder"/>
             </objects>
             <point key="canvasLocation" x="131.8840579710145" y="138.61607142857142"/>
+        </scene>
+        <!--Menu View Controller-->
+        <scene sceneID="tse-9Z-gNG">
+            <objects>
+                <tableViewController id="7h4-SP-dJK" customClass="MenuViewController" customModule="RSS_Parser" customModuleProvider="target" sceneMemberID="viewController">
+                    <tableView key="view" clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="28" sectionFooterHeight="28" id="maw-Nh-roV">
+                        <rect key="frame" x="0.0" y="0.0" width="240" height="808"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                        <sections/>
+                        <connections>
+                            <outlet property="dataSource" destination="7h4-SP-dJK" id="hwX-kL-sg2"/>
+                            <outlet property="delegate" destination="7h4-SP-dJK" id="lmH-Lg-sre"/>
+                        </connections>
+                    </tableView>
+                    <connections>
+                        <outlet property="tableView" destination="maw-Nh-roV" id="93F-KR-pwY"/>
+                    </connections>
+                </tableViewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="gIc-IN-CAE" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="910" y="139"/>
         </scene>
         <!--Navigation Controller-->
         <scene sceneID="2Cj-Ux-PKE">

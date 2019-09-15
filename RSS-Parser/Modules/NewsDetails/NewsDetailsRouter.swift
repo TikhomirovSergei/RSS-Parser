@@ -9,11 +9,15 @@
 import Foundation
 import UIKit
 
-class NewsDetailsRouter: NewsDetailsRouterProtocol {
-    
+class NewsDetailsRouter: NewsDetailsRouterProtocol {    
     weak var viewController: NewsDetailsViewController!
     
     init(viewController: NewsDetailsViewController) {
         self.viewController = viewController
     }
+    
+    func closeViewController() {
+        viewController.navigationController?.popViewController(animated: true)
+    }
+    
 }

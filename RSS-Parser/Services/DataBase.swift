@@ -11,14 +11,15 @@ import UIKit
 import CoreData
 
 class DataBase: DataBaseProtocol {
-    private var selectedNews: NewsModelProtocol? = nil
+    private static var selectedNews: NewsModelProtocol? = nil
+    let lock = NSLock()
     
     func setSelectedNews(news: NewsModelProtocol) {
-        self.selectedNews = news
+        DataBase.selectedNews = news
     }
     
     func getSelectedNews() -> NewsModelProtocol? {
-        return self.selectedNews
+        return DataBase.selectedNews
     }
     
     func saveNewsFeed(newsFeed: NewsFeedModelProtocol) throws {
@@ -75,33 +76,37 @@ class DataBase: DataBaseProtocol {
     }
     
     func updateNews(news: NewsModelProtocol) throws {
-        let lock = NSLock()
-        
         guard let appDelegate = UIApplication.shared.delegate as? AppDelegate else {
             throw "Get application delegate error."
         }
         
         let managedContext = appDelegate.persistentContainer.viewContext
         
-        let fetchRequest = NSFetchRequest<NSFetchRequestResult>(entityName: "News")
-        
-        let titlePredicate = NSPredicate(format: "title = %@", news.title)
-        let linkPredicate = NSPredicate(format: "link = %@", news.link)
-        let descPredicate = NSPredicate(format: "desc = %@", news.desc)
-        let pubDatePredicate = NSPredicate(format: "pubDate = %@", news.pubDate)
-        let authorPredicate = NSPredicate(format: "author = %@", news.author)
-        
-        let subPredicates : [NSPredicate] = [titlePredicate, linkPredicate, descPredicate, pubDatePredicate, authorPredicate]
-        fetchRequest.predicate = NSCompoundPredicate(andPredicateWithSubpredicates: subPredicates)
-        
-        if let fetchResults = try? managedContext.fetch(fetchRequest) as? [NSManagedObject] {
-            if fetchResults.count != 0 {
-                lock.lock()
-                let item = fetchResults[0]
-                item.setValue(news.image?.pngData(), forKey: "image")
+        DispatchQueue.global().async {
+            do {
+                self.lock.lock()
+                let fetchRequest = NSFetchRequest<NSFetchRequestResult>(entityName: "News")
                 
-                try managedContext.save()
-                lock.unlock()
+                let titlePredicate = NSPredicate(format: "title = %@", news.title)
+                let linkPredicate = NSPredicate(format: "link = %@", news.link)
+                let descPredicate = NSPredicate(format: "desc = %@", news.desc)
+                let pubDatePredicate = NSPredicate(format: "pubDate = %@", news.pubDate)
+                let authorPredicate = NSPredicate(format: "author = %@", news.author)
+                
+                let subPredicates : [NSPredicate] = [titlePredicate, linkPredicate, descPredicate, pubDatePredicate, authorPredicate]
+                fetchRequest.predicate = NSCompoundPredicate(andPredicateWithSubpredicates: subPredicates)
+                
+                if let fetchResults = try? managedContext.fetch(fetchRequest) as? [NSManagedObject] {
+                    if fetchResults.count != 0 {
+                        let item = fetchResults[0]
+                        item.setValue(news.image?.pngData(), forKey: "image")
+                        
+                        try managedContext.save()
+                        self.lock.unlock()
+                    }
+                }
+            } catch {
+                self.lock.unlock()
             }
         }
     }

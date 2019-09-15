@@ -11,13 +11,13 @@ import UIKit
 class NewsDetailsViewController: UIViewController, NewsDetailsViewProtocol {
     var presenter: NewsDetailsPresenterProtocol!
     let configurator: NewsDetailsConfiguratorProtocol = NewsDetailsConfigurator()
-    
-    var newsItem: NewsModelProtocol = NewsModel(title: "", link: "", desc: "", pubDate: "", author: "", image: nil)
 
     @IBOutlet var image: UIImageView!
     @IBOutlet var authorLabel: UILabel!
     @IBOutlet var pubDateLabel: UILabel!
+    @IBOutlet var titleLabel: UILabel!
     @IBOutlet var descriptionLabel: UILabel!
+    @IBOutlet var readMoreButton: UIButton!
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -25,19 +25,28 @@ class NewsDetailsViewController: UIViewController, NewsDetailsViewProtocol {
     }
     
     override func viewDidAppear(_ animated: Bool) {
-        self.navigationItem.title = newsItem.title
+        self.navigationItem.title = presenter.setViewTitle()
         
-        image.image = newsItem.image
+        let selectedNews = presenter.getSelectedNews() { image in
+            guard let image = image else {
+                return
+            }
+            
+            self.image.image = image
+        }
+        
+        guard let newsItem = selectedNews else {
+            return
+        }
+        
+        image.image = newsItem.image == nil ? UIImage(#imageLiteral(resourceName: "news")) : newsItem.image
+        titleLabel.text = newsItem.title
         authorLabel.text = newsItem.author
         pubDateLabel.text = newsItem.pubDate
-        
-        var description = newsItem.desc.replacingOccurrences(of: "<[^>]+>", with: "", options: .regularExpression, range: nil)
-        description = description.replacingOccurrences(of: "\r\n", with: "\n\t", options: NSString.CompareOptions.literal, range:nil)
-        description = description.replacingOccurrences(of: "Читать дальше →", with: "", options: NSString.CompareOptions.literal, range:nil)
-        description = description.replacingOccurrences(of: " \n ", with: "", options: NSString.CompareOptions.literal, range:nil)
-        //description = description.replacingOccurrences(of: "\r", with: "", options: NSString.CompareOptions.literal, range:nil)
-        
-        descriptionLabel.text = description
+        descriptionLabel.text = newsItem.desc
     }
 
+    @IBAction func readMoreButtonAction(_ sender: Any) {
+        presenter.readMoreClicked()
+    }
 }

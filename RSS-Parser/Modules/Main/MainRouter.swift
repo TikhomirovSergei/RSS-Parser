@@ -21,10 +21,8 @@ class MainRouter: MainRouterProtocol {
         viewController.dismiss(animated: true, completion: nil)
     }
     
-    func showNewsDetailsViewController(newsItem: NewsModelProtocol) {
+    func showNewsDetailsViewController() {
         let vc = NewsDetailsViewController(nibName: "NewsDetailsViewController", bundle: nil)
-        //vc.modalPresentationStyle = .overFullScreen
-        vc.newsItem = newsItem
         
         let backItem = UIBarButtonItem()
         backItem.title = ""

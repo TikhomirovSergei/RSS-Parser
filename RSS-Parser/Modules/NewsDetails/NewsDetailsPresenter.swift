@@ -7,8 +7,9 @@
 //
 
 import Foundation
+import UIKit
 
-class NewsDetailsPresenter: NewsDetailsPresenterProtocol {
+class NewsDetailsPresenter: NewsDetailsPresenterProtocol {    
     weak var view: NewsDetailsViewProtocol!
     var interactor: NewsDetailsInteractorProtocol!
     
@@ -20,7 +21,17 @@ class NewsDetailsPresenter: NewsDetailsPresenterProtocol {
         
     }
     
-    func setNewsItem(newsItem: NewsModelProtocol) {
-        interactor.setNewsItem(newsItem: newsItem)
+    func setViewTitle() -> String {
+        return interactor.setViewTitle()
+    }
+    
+    func getSelectedNews(completion: @escaping (_ image: UIImage?) -> Void) -> NewsModelProtocol? {
+        return interactor.getSelectedNews() { image in
+            completion(image)
+        }
+    }
+    
+    func readMoreClicked() {
+        interactor.readMoreClicked()
     }
 }

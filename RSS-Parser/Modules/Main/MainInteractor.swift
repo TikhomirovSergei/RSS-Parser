@@ -37,6 +37,7 @@ class MainInteractor: MainInteractorProtocol {
                 self.presenter.hideStartView()
                 self.presenter.updateHeaderInfo(title: newsFeeds[0].title, isEmptyList: false)
             } else {
+                self.url = ""
                 self.presenter.showStartView()
                 self.presenter.updateHeaderInfo(title: defaultTitle, isEmptyList: true)
             }
@@ -159,7 +160,8 @@ class MainInteractor: MainInteractorProtocol {
             if newsFeed.url == "" {
                 presenter.showError(error: "news feed is empty")
             }
-            router.showNewsDetailsViewController(newsItem: newsFeed.news[index])
+            self.dataBase.setSelectedNews(news: newsFeed.news[index])
+            router.showNewsDetailsViewController()
         } catch {
             presenter.showError(error: error)
         }

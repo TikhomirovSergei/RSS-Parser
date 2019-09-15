@@ -69,7 +69,7 @@ protocol MainInteractorProtocol: class {
 }
 
 protocol MainRouterProtocol: class {
-    func showNewsDetailsViewController(newsItem: NewsModelProtocol)
+    func showNewsDetailsViewController()
 }
 
 protocol MainConfiguratorProtocol: class {

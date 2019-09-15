@@ -149,7 +149,7 @@ class DataBase: DataBaseProtocol {
                 
                 let newsFeed = newsFeedModelBD as NewsFeed
                 
-                if url == "" {
+                if url == "" || newsFeed.url == url {
                     if newsFeedModel.url == "" {
                         newsFeedModel.url = newsFeed.url!
                         newsFeedModel.title = newsFeed.title!
@@ -167,26 +167,6 @@ class DataBase: DataBaseProtocol {
                     )
                     
                     newsFeedModel.news.append(newsItem)
-                } else {                    
-                    if newsFeed.url == url {
-                        if newsFeedModel.url == "" {
-                            newsFeedModel.url = newsFeed.url!
-                            newsFeedModel.title = newsFeed.title!
-                            newsFeedModel.link = newsFeed.link!
-                            newsFeedModel.desc = newsFeed.desc!
-                        }
-                        
-                        let newsItem = NewsModel(
-                            title: news.title!,
-                            link: news.link!,
-                            desc: news.desc!,
-                            pubDate: news.pubDate!,
-                            author: news.author!,
-                            image: news.image != nil ? UIImage(data: news.image!) : nil
-                        )
-                        
-                        newsFeedModel.news.append(newsItem)
-                    }
                 }
             }
         } catch {
@@ -217,7 +197,7 @@ class DataBase: DataBaseProtocol {
             throw error
         }
         
-        return newsFeeds
+        return newsFeeds.sorted { $0.title > $1.title }
     }
     
     private func clearNewsFeed(context: NSManagedObjectContext, url: String) throws {

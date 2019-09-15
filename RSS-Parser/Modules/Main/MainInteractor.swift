@@ -9,7 +9,7 @@
 import Foundation
 import UIKit
 
-class MainInteractor: MainInteractorProtocol {
+class MainInteractor: MainInteractorProtocol {    
     private let title = "New RSS"
     private let inputPlaceholder = "set url"
     private let openUrl = "Open original"
@@ -35,6 +35,8 @@ class MainInteractor: MainInteractorProtocol {
             let newsFeeds = try dataBase.getNewsFeeds()
             if newsFeeds.count > 0 {
                 dataBase.setSelectedUrl(selectedUrl: newsFeeds[0].url)
+                self.presenter.startLoading()
+                self.refreshData(timer: -1)
                 self.presenter.endLoading()
                 self.presenter.hideStartView()
                 self.presenter.updateHeaderInfo(title: newsFeeds[0].title, isEmptyList: false)
@@ -50,9 +52,9 @@ class MainInteractor: MainInteractorProtocol {
         }
     }
     
-    func refreshData() {
+    func refreshData(timer: Int) {
         let diff = Int(Date().timeIntervalSince1970 - refreshTime.timeIntervalSince1970)
-        if diff >= 60 {
+        if diff >= timer {
             refreshTime = Date()
             self.service.getNews(urlString: dataBase.getSelectedUrl()) { rss, error in
                 guard let rss = rss,

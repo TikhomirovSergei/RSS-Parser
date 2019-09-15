@@ -103,7 +103,7 @@ class MainPresenter: MainPresenterProtocol {
     }
     
     func refreshData() {
-        interactor.refreshData()
+        interactor.refreshData(timer: 60)
     }
     
     func endRefreshing() {

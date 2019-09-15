@@ -64,7 +64,7 @@ protocol MainInteractorProtocol: class {
     var defaultTitle: String { get }
     
     func getDefaultNewsFeed()
-    func refreshData()
+    func refreshData(timer: Int)
     func menuClicked()
     func addNewUrl()
     func showInfoAboutNewsStream()

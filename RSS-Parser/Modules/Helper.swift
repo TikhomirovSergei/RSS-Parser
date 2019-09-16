@@ -12,7 +12,7 @@ import UIKit
 class Helper {
     
     func createCustomButton(view: UIViewController, name: String, selector: Selector) -> UIButton {
-        let button = UIButton(frame: CGRect(x: 0, y: 0, width: 26, height: 26))
+        let button = UIButton(frame: CGRect(x: 0, y: 0, width: 30, height: 30))
         var img = self.imageWithImage(image: UIImage(named: name)!, scaledToSize: CGSize(width: 26, height: 26))
         img = img.withRenderingMode(.alwaysTemplate)
         button.setImage(img, for: .normal)

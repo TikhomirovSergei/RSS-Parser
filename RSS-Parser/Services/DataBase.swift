@@ -14,6 +14,7 @@ class DataBase: DataBaseProtocol {
     private static var selectedUrl = ""
     private static var menuIsOpen = false
     private static var selectedNews: NewsModelProtocol? = nil
+    //private var selectedNewsFeed: NewsFeedModelProtocol = NewsFeedModel(url: "", title: "", link: "", desc: "", news: [])
     let lock = NSLock()
     
     func setSelectedNews(news: NewsModelProtocol) {
@@ -174,6 +175,29 @@ class DataBase: DataBaseProtocol {
             }
         } catch {
             throw error
+        }
+        
+        newsFeedModel.news.sort {
+            let date1 = $0.pubDate.replacingOccurrences(of: "\n", with: "", options: NSString.CompareOptions.literal, range:nil)
+            let date2 = $1.pubDate.replacingOccurrences(of: "\n", with: "", options: NSString.CompareOptions.literal, range:nil)
+            
+            let dateFormatter = DateFormatter()
+            dateFormatter.dateFormat = "E, d MMM yyyy HH:mm:ss"
+            if let d1 = dateFormatter.date(from: date1), let d2 = dateFormatter.date(from: date2) {
+                return d1 > d2
+            } else {
+                dateFormatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ssZ"
+                if let d1 = dateFormatter.date(from: date1), let d2 = dateFormatter.date(from: date2) {
+                    return d1 > d2
+                } else {
+                    dateFormatter.dateFormat = "E, d MMM yyyy HH:mm:ss Z"
+                    if let d1 = dateFormatter.date(from: date1), let d2 = dateFormatter.date(from: date2) {
+                        return d1 > d2
+                    } else {
+                        return false
+                    }
+                }
+            }
         }
         
         return newsFeedModel

@@ -14,7 +14,6 @@ class DataBase: DataBaseProtocol {
     private static var selectedUrl = ""
     private static var menuIsOpen = false
     private static var selectedNews: NewsModelProtocol? = nil
-    //private var selectedNewsFeed: NewsFeedModelProtocol = NewsFeedModel(url: "", title: "", link: "", desc: "", news: [])
     let lock = NSLock()
     
     func setSelectedNews(news: NewsModelProtocol) {
@@ -95,7 +94,7 @@ class DataBase: DataBaseProtocol {
         }
     }
     
-    func updateNews(news: NewsModelProtocol) throws {
+    func updateNews(url: String, news: NewsModelProtocol) throws {
         guard let appDelegate = UIApplication.shared.delegate as? AppDelegate else {
             throw "Get application delegate error."
         }
@@ -132,75 +131,85 @@ class DataBase: DataBaseProtocol {
         }
     }
     
-    func getNewsFeed(url: String) throws -> NewsFeedModelProtocol {
-        var newsFeedModel = NewsFeedModel(url: "", title: "", link: "", desc: "", news: [])
-        
+    func getNewsFeed(url: String, completion: @escaping (_ newsFeedModel: NewsFeedModelProtocol?, _ error: Error?) -> Void) {
         guard let appDelegate = UIApplication.shared.delegate as? AppDelegate else {
-            throw "Get application delegate error."
+            completion(nil, "Get application delegate error.")
+            return
         }
         
-        let managedContext = appDelegate.persistentContainer.viewContext
-        let fetchRequest = NSFetchRequest<NSManagedObject>(entityName: "News")
-        
-        do {
-            let newsArray = try managedContext.fetch(fetchRequest)
+        DispatchQueue.global().async {
+            var newsFeedModel = NewsFeedModel(url: "", title: "", link: "", desc: "", news: [])
             
-            for news in newsArray as! [News] {
-                guard let newsFeedModelBD = news.newsFeed else {
-                    return newsFeedModel
-                }
+            let managedContext = appDelegate.persistentContainer.viewContext
+            let fetchRequest = NSFetchRequest<NSManagedObject>(entityName: "News")
+            
+            do {
+                let newsArray = try managedContext.fetch(fetchRequest)
                 
-                let newsFeed = newsFeedModelBD as NewsFeed
-                
-                if url == "" || newsFeed.url == url {
-                    if newsFeedModel.url == "" {
-                        newsFeedModel.url = newsFeed.url!
-                        newsFeedModel.title = newsFeed.title!
-                        newsFeedModel.link = newsFeed.link!
-                        newsFeedModel.desc = newsFeed.desc!
+                for news in newsArray as! [News] {
+                    guard let newsFeedModelBD = news.newsFeed else {
+                        DispatchQueue.main.async {
+                            completion(newsFeedModel, nil)
+                        }
+                        return
                     }
                     
-                    let newsItem = NewsModel(
-                        title: news.title!,
-                        link: news.link!,
-                        desc: news.desc!,
-                        pubDate: news.pubDate!,
-                        author: news.author!,
-                        thumbnail: news.thumbnail!,
-                        image: news.image != nil ? UIImage(data: news.image!) : nil
-                    )
+                    let newsFeed = newsFeedModelBD as NewsFeed
                     
-                    newsFeedModel.news.append(newsItem)
+                    if url == "" || newsFeed.url == url {
+                        if newsFeedModel.url == "" {
+                            newsFeedModel.url = newsFeed.url!
+                            newsFeedModel.title = newsFeed.title!
+                            newsFeedModel.link = newsFeed.link!
+                            newsFeedModel.desc = newsFeed.desc!
+                        }
+                        
+                        let newsItem = NewsModel(
+                            title: news.title!,
+                            link: news.link!,
+                            desc: news.desc!,
+                            pubDate: news.pubDate!,
+                            author: news.author!,
+                            thumbnail: news.thumbnail!,
+                            image: news.image != nil ? UIImage(data: news.image!) : nil
+                        )
+                        
+                        newsFeedModel.news.append(newsItem)
+                    }
                 }
-            }
-        } catch {
-            throw error
-        }
-        
-        newsFeedModel.news.sort {
-            let date1 = $0.pubDate.replacingOccurrences(of: "\n", with: "", options: NSString.CompareOptions.literal, range:nil)
-            let date2 = $1.pubDate.replacingOccurrences(of: "\n", with: "", options: NSString.CompareOptions.literal, range:nil)
-            
-            let dateFormatter = DateFormatter()
-            dateFormatter.dateFormat = "E, d MMM yyyy HH:mm:ss"
-            if let d1 = dateFormatter.date(from: date1), let d2 = dateFormatter.date(from: date2) {
-                return d1 > d2
-            } else {
-                dateFormatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ssZ"
-                if let d1 = dateFormatter.date(from: date1), let d2 = dateFormatter.date(from: date2) {
-                    return d1 > d2
-                } else {
-                    dateFormatter.dateFormat = "E, d MMM yyyy HH:mm:ss Z"
+                
+                newsFeedModel.news.sort {
+                    let date1 = $0.pubDate.replacingOccurrences(of: "\n", with: "", options: NSString.CompareOptions.literal, range:nil)
+                    let date2 = $1.pubDate.replacingOccurrences(of: "\n", with: "", options: NSString.CompareOptions.literal, range:nil)
+                    
+                    let dateFormatter = DateFormatter()
+                    dateFormatter.dateFormat = "E, d MMM yyyy HH:mm:ss"
                     if let d1 = dateFormatter.date(from: date1), let d2 = dateFormatter.date(from: date2) {
                         return d1 > d2
                     } else {
-                        return false
+                        dateFormatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ssZ"
+                        if let d1 = dateFormatter.date(from: date1), let d2 = dateFormatter.date(from: date2) {
+                            return d1 > d2
+                        } else {
+                            dateFormatter.dateFormat = "E, d MMM yyyy HH:mm:ss Z"
+                            if let d1 = dateFormatter.date(from: date1), let d2 = dateFormatter.date(from: date2) {
+                                return d1 > d2
+                            } else {
+                                return false
+                            }
+                        }
                     }
+                }
+                
+                DispatchQueue.main.async {
+                    completion(newsFeedModel, nil)
+                }
+            } catch {
+                DispatchQueue.main.async {
+                    completion(nil, error.localizedDescription)
                 }
             }
         }
-        
-        return newsFeedModel
     }
     
     func getNewsFeeds() throws -> [NewsFeedModelProtocol] {
@@ -244,4 +253,5 @@ class DataBase: DataBaseProtocol {
             throw error
         }
     }
+    
 }

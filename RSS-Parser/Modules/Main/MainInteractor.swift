@@ -22,7 +22,7 @@ class MainInteractor: MainInteractorProtocol {
     
     var defaultTitle = "RSS Parser"
     private var refreshTime = Date(timeIntervalSince1970: 0)
-    private var menuIsOpened = false
+    private var selectedNewsFeeds: NewsFeedModelProtocol = NewsFeedModel(url: "", title: "", link: "", desc: "", news: [])
     
     required init(presenter: MainPresenterProtocol) {
         self.presenter = presenter
@@ -35,6 +35,17 @@ class MainInteractor: MainInteractorProtocol {
             let newsFeeds = try dataBase.getNewsFeeds()
             if newsFeeds.count > 0 {
                 dataBase.setSelectedUrl(selectedUrl: newsFeeds[0].url)
+                dataBase.getNewsFeed(url: newsFeeds[0].url) { newsFeeds, error in
+                    guard let newsFeeds = newsFeeds, error == nil else {
+                        self.dataBase.setSelectedUrl(selectedUrl: "")
+                        self.presenter.showStartView()
+                        self.presenter.updateHeaderInfo(title: self.defaultTitle, isEmptyList: true)
+                        return
+                    }
+                    
+                    self.selectedNewsFeeds = newsFeeds
+                    self.presenter.reloadData()
+                }
                 self.presenter.startLoading()
                 self.refreshData(timer: -1)
                 self.presenter.endLoading()
@@ -66,9 +77,19 @@ class MainInteractor: MainInteractorProtocol {
                 
                 do {
                     try self.dataBase.saveNewsFeed(newsFeed: rss)
-                    self.postNotificationToUpdateSideMenu()
-                    self.presenter.endRefreshing()
-                    self.presenter.reloadData()
+                    self.dataBase.getNewsFeed(url: self.dataBase.getSelectedUrl()) { newsFeeds, error in
+                        guard let newsFeeds = newsFeeds, error == nil else {
+                            self.presenter.endRefreshing()
+                            self.presenter.showError(error: error!)
+                            return
+                        }
+                        
+                        self.selectedNewsFeeds = newsFeeds
+                        
+                        self.postNotificationToUpdateSideMenu()
+                        self.presenter.endRefreshing()
+                        self.presenter.reloadData()
+                    }
                 } catch {
                     self.presenter.endRefreshing()
                     self.presenter.showError(error: error)
@@ -80,13 +101,13 @@ class MainInteractor: MainInteractorProtocol {
     }
     
     func menuClicked() {
-        if menuIsOpened {
+        if dataBase.getMenuIsOpen() {
+            dataBase.setMenuIsOpen(menuIsOpen: false)
             presenter.hideSideMenu()
         } else {
+            dataBase.setMenuIsOpen(menuIsOpen: true)
             presenter.showSideMenu()
         }
-        
-        menuIsOpened = !menuIsOpened
     }
     
     func addNewUrl() {
@@ -113,10 +134,19 @@ class MainInteractor: MainInteractorProtocol {
                     try self.dataBase.saveNewsFeed(newsFeed: rss)
                     self.postNotificationToUpdateSideMenu()
                     self.dataBase.setSelectedUrl(selectedUrl: textUrl)
-                    
-                    self.presenter.endLoading()
-                    self.presenter.updateHeaderInfo(title: rss.title, isEmptyList: false)
-                    self.presenter.reloadData()
+                    self.dataBase.getNewsFeed(url: textUrl) { newsFeeds, error in
+                        guard let newsFeeds = newsFeeds, error == nil else {
+                            self.dataBase.setSelectedUrl(selectedUrl: "")
+                            self.presenter.showStartView()
+                            self.presenter.updateHeaderInfo(title: self.defaultTitle, isEmptyList: true)
+                            return
+                        }
+                        
+                        self.selectedNewsFeeds = newsFeeds
+                        self.presenter.endLoading()
+                        self.presenter.updateHeaderInfo(title: rss.title, isEmptyList: false)
+                        self.presenter.reloadData()
+                    }
                 } catch {
                     self.presenter.endLoading()
                     self.dataBase.getSelectedUrl() == "" ? self.presenter.showStartView() : nil
@@ -127,102 +157,73 @@ class MainInteractor: MainInteractorProtocol {
     }
     
     func showInfoAboutNewsStream() {
-        do {
-            var newsFeed = try self.dataBase.getNewsFeed(url: dataBase.getSelectedUrl())
-            if newsFeed.url == "" {
-                presenter.showError(error: "news feed is empty")
-            }
-            
-            presenter.showAlertWhenButtonClick(title: newsFeed.title, description: newsFeed.desc, okButtonText: openUrl, cancelButtonText: cancel) { openUrl in
-                if openUrl {
-                    var url = newsFeed.link
-                    while (url.last == "/") {
-                        url = String(url.dropLast())
-                    }
-                    self.service.openUrl(with: url)
+        if selectedNewsFeeds.url == "" {
+            presenter.showError(error: "news feed is empty")
+        }
+        
+        presenter.showAlertWhenButtonClick(title: selectedNewsFeeds.title, description: selectedNewsFeeds.desc, okButtonText: openUrl, cancelButtonText: cancel) { openUrl in
+            if openUrl {
+                var url = self.selectedNewsFeeds.link
+                while (url.last == "/") {
+                    url = String(url.dropLast())
                 }
+                self.service.openUrl(with: url)
             }
-        } catch {
-            presenter.showError(error: error)
         }
     }
     
     func deleteButtonClicked() {
-        do {
-            var newsFeed = try self.dataBase.getNewsFeed(url: dataBase.getSelectedUrl())
-            if newsFeed.url == "" {
-                presenter.showError(error: "news feed is empty")
-            }
-            
-            presenter.showAlertWhenButtonClick(title: "", description: "Are you sure you want to delete the news feed [\(newsFeed.title)]?", okButtonText: "Ok", cancelButtonText: cancel) { deleteStream in
-                if deleteStream {
-                    do {
-                        try self.dataBase.deleteNewsFeed(url: newsFeed.url)
-                        self.postNotificationToUpdateSideMenu()
-                        self.getDefaultNewsFeed()
-                        self.presenter.reloadData()
-                    } catch {
-                        self.presenter.showError(error: error)
-                    }
+        if selectedNewsFeeds.url == "" {
+            presenter.showError(error: "news feed is empty")
+        }
+        
+        presenter.showAlertWhenButtonClick(title: "", description: "Are you sure you want to delete the news feed [\(selectedNewsFeeds.title)]?", okButtonText: "Ok", cancelButtonText: cancel) { deleteStream in
+            if deleteStream {
+                do {
+                    try self.dataBase.deleteNewsFeed(url: self.selectedNewsFeeds.url)
+                    self.postNotificationToUpdateSideMenu()
+                    self.getDefaultNewsFeed()
+                } catch {
+                    self.presenter.showError(error: error)
                 }
             }
-        } catch {
-            presenter.showError(error: error)
         }
     }
     
     func cellClicked(index: Int) {
-        do {
-            var newsFeed = try self.dataBase.getNewsFeed(url: dataBase.getSelectedUrl())
-            if newsFeed.url == "" {
-                presenter.showError(error: "news feed is empty")
-            }
-            self.dataBase.setSelectedNews(news: newsFeed.news[index])
-            router.showNewsDetailsViewController()
-            dataBase.setMenuIsOpen(menuIsOpen: false)
-            presenter.hideSideMenu()
-        } catch {
-            presenter.showError(error: error)
+        if selectedNewsFeeds.url == "" {
+            presenter.showError(error: "news feed is empty")
         }
+        self.dataBase.setSelectedNews(news: selectedNewsFeeds.news[index])
+        router.showNewsDetailsViewController()
+        dataBase.setMenuIsOpen(menuIsOpen: false)
+        presenter.hideSideMenu()
     }
     
     func getNewsCount() -> Int {
-        do {
-            var newsFeed = try self.dataBase.getNewsFeed(url: dataBase.getSelectedUrl())
-            if newsFeed.url == "" {
-               return 0
-            } else {
-                return newsFeed.news.count
-            }
-        } catch {
-            presenter.showError(error: error)
-            return 0
-        }
+        return selectedNewsFeeds.url == ""
+            ? 0
+            : selectedNewsFeeds.news.count
     }
     
     func getNewsItem(index: Int, completion: @escaping (_ image: UIImage?) -> Void) -> NewsModelProtocol {
         var model = NewsModel(title: "", link: "", desc: "", pubDate: "", author: "", thumbnail: "", image: nil)
         
-        do {
-            var newsFeed = try self.dataBase.getNewsFeed(url: dataBase.getSelectedUrl())
-            let item = newsFeed.news[index]
-            var description = item.desc.replacingOccurrences(of: "<[^>]+>", with: "", options: .regularExpression, range: nil)
-            description = description.replacingOccurrences(of: "\n", with: "", options: NSString.CompareOptions.literal, range:nil)
-            description = description.replacingOccurrences(of: "\r", with: "", options: NSString.CompareOptions.literal, range:nil)
-            
-            self.loadImage(news: newsFeed.news[index]) { image in
-                completion(image)
-            }
-            
-            model.title = item.title
-            model.link = item.link
-            model.desc = description
-            model.pubDate = item.pubDate
-            model.author = item.author
-            model.image = item.image
-        } catch {
-            presenter.showError(error: error)
+        let item = selectedNewsFeeds.news[index]
+        var description = item.desc.replacingOccurrences(of: "<[^>]+>", with: "", options: .regularExpression, range: nil)
+        description = description.replacingOccurrences(of: "\n", with: "", options: NSString.CompareOptions.literal, range:nil)
+        description = description.replacingOccurrences(of: "\r", with: "", options: NSString.CompareOptions.literal, range:nil)
+        
+        self.loadImage(news: item) { image in
+            completion(image)
         }
+        
+        model.title = item.title
+        model.link = item.link
+        model.desc = description
+        model.pubDate = item.pubDate
+        model.author = item.author
+        model.image = item.image
         
         return model
     }
@@ -262,7 +263,7 @@ class MainInteractor: MainInteractorProtocol {
     private func saveImage(news: NewsModelProtocol, image: UIImage) {
         do {
             let newsModel = NewsModel(title: news.title, link: news.link, desc: news.desc, pubDate: news.pubDate, author: news.author, thumbnail: news.thumbnail, image: image)
-            try self.dataBase.updateNews(news: newsModel)
+            try self.dataBase.updateNews(url: self.dataBase.getSelectedUrl(), news: newsModel)
         } catch {
             self.presenter.showError(error: error.localizedDescription)
         }
@@ -279,7 +280,18 @@ class MainInteractor: MainInteractorProtocol {
             let selectedNewsFeed = newsFeeds.filter { $0.url == selectedUrl }
             
             if selectedNewsFeed.count > 0 {
-                presenter.updateHeaderInfo(title: selectedNewsFeed[0].title, isEmptyList: false)
+                dataBase.getNewsFeed(url: selectedNewsFeed[0].url) { newsFeeds, error in
+                    guard let newsFeeds = newsFeeds, error == nil else {
+                        self.dataBase.setSelectedUrl(selectedUrl: "")
+                        self.presenter.showStartView()
+                        self.presenter.updateHeaderInfo(title: self.defaultTitle, isEmptyList: true)
+                        return
+                    }
+                    
+                    self.presenter.updateHeaderInfo(title: selectedNewsFeed[0].title, isEmptyList: false)
+                    self.selectedNewsFeeds = newsFeeds
+                    self.presenter.reloadData()
+                }
             }
         } catch {
             presenter.showError(error: error)
@@ -294,7 +306,6 @@ class MainInteractor: MainInteractorProtocol {
         }
         
         refreshTime = Date(timeIntervalSince1970: 0)
-        self.presenter.reloadData()
     }
     
 }

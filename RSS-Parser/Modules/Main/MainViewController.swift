@@ -123,7 +123,7 @@ class MainViewController: UIViewController, MainViewProtocol, UITableViewDelegat
             
             alert.addTextField {
                 $0.placeholder = inputPlaceholder
-                $0.text = "https://lenta.ru/rss/news"// "https://habrahabr.ru/rss/interesting/"
+                $0.text = "https://lenta.ru/rss/news"
                 $0.addTarget(alert, action: #selector(alert.urlValidate), for: .editingChanged)
             }
             

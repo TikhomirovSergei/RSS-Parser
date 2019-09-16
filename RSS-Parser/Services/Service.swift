@@ -14,7 +14,7 @@ class Service: ServiceProtocol {
     
     // MARK: - ServiceProtocol methods
     
-    func getNews(urlString: String, completion: @escaping (NewsFeedModel?, Error?) -> Void) {
+    func getNews(urlString: String, completion: @escaping (NewsFeedModelProtocol?, Error?) -> Void) {
         if let URL = URL(string: urlString) {
             getRSSModel(URL: URL, completion: completion)
         }

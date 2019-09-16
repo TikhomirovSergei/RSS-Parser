@@ -18,7 +18,7 @@ protocol DataBaseProtocol: class {
     func getMenuIsOpen() -> Bool
     func saveNewsFeed(newsFeed: NewsFeedModelProtocol) throws
     func deleteNewsFeed(url: String) throws
-    func updateNews(news: NewsModelProtocol) throws
-    func getNewsFeed(url: String) throws -> NewsFeedModelProtocol
+    func updateNews(url: String, news: NewsModelProtocol) throws
+    func getNewsFeed(url: String, completion: @escaping (_ newsFeedModel: NewsFeedModelProtocol?, _ error: Error?) -> Void)
     func getNewsFeeds() throws -> [NewsFeedModelProtocol]
 }

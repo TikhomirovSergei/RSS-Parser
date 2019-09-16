@@ -102,7 +102,7 @@ class NewsDetailsInteractor: NewsDetailsInteractorProtocol {
     private func saveImage(news: NewsModelProtocol, image: UIImage) {
         do {
             let newsModel = NewsModel(title: news.title, link: news.link, desc: news.desc, pubDate: news.pubDate, author: news.author, thumbnail: news.thumbnail, image: image)
-            try self.dataBase.updateNews(news: newsModel)
+            try self.dataBase.updateNews(url: dataBase.getSelectedUrl(), news: newsModel)
         } catch {
             self.presenter.showError(error: error.localizedDescription)
         }

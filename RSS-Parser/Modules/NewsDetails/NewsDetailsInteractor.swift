@@ -32,24 +32,8 @@ class NewsDetailsInteractor: NewsDetailsInteractorProtocol {
             return nil
         }
         
-        if newsItem.image == nil {
-            service.loadImage(attributedString: newsItem.desc) { image, error in
-                guard let image = image else {
-                    completion(nil)
-                    return
-                }
-                
-                do {
-                    let newsModel = NewsModel(title: newsItem.title, link: newsItem.link, desc: newsItem.desc, pubDate: newsItem.pubDate, author: newsItem.author, image: image)
-                    try self.dataBase.updateNews(news: newsModel)
-                } catch {
-                    print("Failed to save news picture in database.")
-                }
-                
-                completion(image)
-            }
-        } else {
-            completion(nil)
+        self.loadImage(news: newsItem) { image in
+            completion(image)
         }
         
         var desc = newsItem.desc.replacingOccurrences(of: "<[^>]+>", with: "", options: .regularExpression, range: nil)
@@ -64,6 +48,7 @@ class NewsDetailsInteractor: NewsDetailsInteractorProtocol {
             desc: desc,
             pubDate: newsItem.pubDate,
             author: newsItem.author,
+            thumbnail: newsItem.thumbnail,
             image: newsItem.image)
         
         return model
@@ -81,4 +66,46 @@ class NewsDetailsInteractor: NewsDetailsInteractorProtocol {
         
         service.openUrl(with: link)
     }
+    
+    private func loadImage(news: NewsModelProtocol, completion: @escaping (_ image: UIImage?) -> Void) {
+        if news.image == nil {
+            if news.thumbnail != "" {
+                service.loadImageFromUrl(url: news.thumbnail) { image, error in
+                    guard let image = image, error == nil else {
+                        self.presenter.showError(error: error!.localizedDescription)
+                        completion(nil)
+                        return
+                    }
+                    
+                    self.saveImage(news: news, image: image)
+                    completion(image)
+                }
+            } else {
+                service.loadImage(attributedString: news.desc) { image, error in
+                    guard let image = image else {
+                        if error != nil {
+                            self.presenter.showError(error: error!.localizedDescription)
+                        }
+                        completion(nil)
+                        return
+                    }
+                    
+                    self.saveImage(news: news, image: image)
+                    completion(image)
+                }
+            }
+        } else {
+            completion(nil)
+        }
+    }
+    
+    private func saveImage(news: NewsModelProtocol, image: UIImage) {
+        do {
+            let newsModel = NewsModel(title: news.title, link: news.link, desc: news.desc, pubDate: news.pubDate, author: news.author, thumbnail: news.thumbnail, image: image)
+            try self.dataBase.updateNews(news: newsModel)
+        } catch {
+            self.presenter.showError(error: error.localizedDescription)
+        }
+    }
+    
 }

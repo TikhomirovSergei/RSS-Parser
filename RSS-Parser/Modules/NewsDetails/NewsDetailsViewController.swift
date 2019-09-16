@@ -49,4 +49,12 @@ class NewsDetailsViewController: UIViewController, NewsDetailsViewProtocol {
     @IBAction func readMoreButtonAction(_ sender: Any) {
         presenter.readMoreClicked()
     }
+    
+    func showAlertView(with text: String) {
+        DispatchQueue.main.async {
+            let alert = UIAlertController(title: "", message: text, preferredStyle: .alert)
+            alert.addAction(UIAlertAction(title: "Ok", style: .default) { action in })
+            self.present(alert, animated: true, completion: nil)
+        }
+    }
 }

@@ -15,5 +15,6 @@ struct NewsModel: NewsModelProtocol {
     var desc: String
     var pubDate: String
     var author: String
+    var thumbnail: String
     var image: UIImage?
 }

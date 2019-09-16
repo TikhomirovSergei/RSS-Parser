@@ -34,4 +34,8 @@ class NewsDetailsPresenter: NewsDetailsPresenterProtocol {
     func readMoreClicked() {
         interactor.readMoreClicked()
     }
+    
+    func showError(error: String) {
+        self.view.showAlertView(with: error)
+    }
 }

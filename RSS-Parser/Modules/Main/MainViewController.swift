@@ -110,15 +110,11 @@ class MainViewController: UIViewController, MainViewProtocol, UITableViewDelegat
     }
     
     func showSideMenu() {
-        UIView.animate(withDuration: 0.5) {
-            self.sideMenu.alpha = 1
-        }
+        self.sideMenu.alpha = 1
     }
     
     func hideSideMenu() {
-        UIView.animate(withDuration: 0.5) {
-            self.sideMenu.alpha = 0
-        }
+        self.sideMenu.alpha = 0
     }
     
     func setURLView(title: String, inputPlaceholder: String, completion: @escaping (_ text: String?) -> Void) {

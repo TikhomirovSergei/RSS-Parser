@@ -21,7 +21,7 @@ class MainInteractor: MainInteractorProtocol {
     let dataBase: DataBaseProtocol = DataBase()
     
     var defaultTitle = "RSS Parser"
-    private var refreshTime = Date()
+    private var refreshTime = Date(timeIntervalSince1970: 0)
     private var menuIsOpened = false
     
     required init(presenter: MainPresenterProtocol) {
@@ -201,7 +201,7 @@ class MainInteractor: MainInteractorProtocol {
     }
     
     func getNewsItem(index: Int, completion: @escaping (_ image: UIImage?) -> Void) -> NewsModelProtocol {
-        var model = NewsModel(title: "", link: "", desc: "", pubDate: "", author: "", image: nil)
+        var model = NewsModel(title: "", link: "", desc: "", pubDate: "", author: "", thumbnail: "", image: nil)
         
         do {
             var newsFeed = try self.dataBase.getNewsFeed(url: dataBase.getSelectedUrl())
@@ -210,24 +210,8 @@ class MainInteractor: MainInteractorProtocol {
             description = description.replacingOccurrences(of: "\n", with: "", options: NSString.CompareOptions.literal, range:nil)
             description = description.replacingOccurrences(of: "\r", with: "", options: NSString.CompareOptions.literal, range:nil)
             
-            if newsFeed.news[index].image == nil {
-                service.loadImage(attributedString: item.desc) { image, error in
-                    guard let image = image else {
-                        completion(nil)
-                        return
-                    }
-                    
-                    do {
-                        let newsModel = NewsModel(title: item.title, link: item.link, desc: item.desc, pubDate: item.pubDate, author: item.author, image: image)
-                        try self.dataBase.updateNews(news: newsModel)
-                    } catch {
-                        self.presenter.showError(error: error)
-                    }
-                    
-                    completion(image)
-                }
-            } else {
-                completion(nil)
+            self.loadImage(news: newsFeed.news[index]) { image in
+                completion(image)
             }
             
             model.title = item.title
@@ -243,6 +227,47 @@ class MainInteractor: MainInteractorProtocol {
         return model
     }
     
+    private func loadImage(news: NewsModelProtocol, completion: @escaping (_ image: UIImage?) -> Void) {
+        if news.image == nil {
+            if news.thumbnail != "" {
+                service.loadImageFromUrl(url: news.thumbnail) { image, error in
+                    guard let image = image, error == nil else {
+                        self.presenter.showError(error: error!.localizedDescription)
+                        completion(nil)
+                        return
+                    }
+                    
+                    self.saveImage(news: news, image: image)
+                    completion(image)
+                }
+            } else {
+                service.loadImage(attributedString: news.desc) { image, error in
+                    guard let image = image else {
+                        if error != nil {
+                            self.presenter.showError(error: error!.localizedDescription)
+                        }
+                        completion(nil)
+                        return
+                    }
+                    
+                    self.saveImage(news: news, image: image)
+                    completion(image)
+                }
+            }
+        } else {
+            completion(nil)
+        }
+    }
+    
+    private func saveImage(news: NewsModelProtocol, image: UIImage) {
+        do {
+            let newsModel = NewsModel(title: news.title, link: news.link, desc: news.desc, pubDate: news.pubDate, author: news.author, thumbnail: news.thumbnail, image: image)
+            try self.dataBase.updateNews(news: newsModel)
+        } catch {
+            self.presenter.showError(error: error.localizedDescription)
+        }
+    }
+    
     private func postNotificationToUpdateSideMenu() {
         NotificationCenter.default.post(name: NSNotification.Name(rawValue: "updateSideMenu"), object: nil, userInfo: nil)
     }
@@ -256,7 +281,9 @@ class MainInteractor: MainInteractorProtocol {
             if selectedNewsFeed.count > 0 {
                 presenter.updateHeaderInfo(title: selectedNewsFeed[0].title, isEmptyList: false)
             }
-        } catch { }
+        } catch {
+            presenter.showError(error: error)
+        }
         
         if dataBase.getMenuIsOpen() {
             dataBase.setMenuIsOpen(menuIsOpen: false)
@@ -266,6 +293,7 @@ class MainInteractor: MainInteractorProtocol {
             presenter.showSideMenu()
         }
         
+        refreshTime = Date(timeIntervalSince1970: 0)
         self.presenter.reloadData()
     }
     

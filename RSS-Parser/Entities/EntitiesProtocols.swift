@@ -15,6 +15,7 @@ protocol NewsModelProtocol {
     var desc: String { get set }
     var pubDate: String { get set }
     var author: String { get set }
+    var thumbnail: String { get set }
     var image: UIImage? { get set }
 }
 

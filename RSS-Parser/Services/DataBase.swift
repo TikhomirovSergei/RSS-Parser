@@ -69,6 +69,7 @@ class DataBase: DataBaseProtocol {
                 newsObject.setValue(newsFeed.news[i].desc, forKey: "desc")
                 newsObject.setValue(newsFeed.news[i].pubDate, forKey: "pubDate")
                 newsObject.setValue(newsFeed.news[i].author, forKey: "author")
+                newsObject.setValue(newsFeed.news[i].thumbnail, forKey: "thumbnail")
                 newsObject.setValue(newsFeed.news[i].image?.pngData(), forKey: "image")
                 
                 newsObject.setValue(newsFeedObject, forKey: "newsFeed")
@@ -110,8 +111,9 @@ class DataBase: DataBaseProtocol {
                 let descPredicate = NSPredicate(format: "desc = %@", news.desc)
                 let pubDatePredicate = NSPredicate(format: "pubDate = %@", news.pubDate)
                 let authorPredicate = NSPredicate(format: "author = %@", news.author)
+                let thumbnailPredicate = NSPredicate(format: "thumbnail = %@", news.thumbnail)
                 
-                let subPredicates : [NSPredicate] = [titlePredicate, linkPredicate, descPredicate, pubDatePredicate, authorPredicate]
+                let subPredicates : [NSPredicate] = [titlePredicate, linkPredicate, descPredicate, pubDatePredicate, authorPredicate, thumbnailPredicate]
                 fetchRequest.predicate = NSCompoundPredicate(andPredicateWithSubpredicates: subPredicates)
                 
                 if let fetchResults = try? managedContext.fetch(fetchRequest) as? [NSManagedObject] {
@@ -163,6 +165,7 @@ class DataBase: DataBaseProtocol {
                         desc: news.desc!,
                         pubDate: news.pubDate!,
                         author: news.author!,
+                        thumbnail: news.thumbnail!,
                         image: news.image != nil ? UIImage(data: news.image!) : nil
                     )
                     

@@ -17,6 +17,7 @@ class XMLRSSParser: NSObject, XMLParserDelegate {
     private var currentDescription = ""
     private var currentPubDate = ""
     private var currentAuthor = ""
+    private var currentThumbnail = ""
     
     private var firstTitleElement = ""
     private var isFirstTitleElement = true
@@ -46,6 +47,7 @@ class XMLRSSParser: NSObject, XMLParserDelegate {
             currentDescription = ""
             currentPubDate = ""
             currentAuthor = ""
+            currentThumbnail = ""
         }
     }
     
@@ -72,12 +74,12 @@ class XMLRSSParser: NSObject, XMLParserDelegate {
                 firstDescriptionElement += string
                 isFirstDescriptionElement = false
             } else {
-                //let str = string.replacingOccurrences(of: "<[^>]+>", with: "", options: .regularExpression, range: nil)
                 currentDescription += string
             }}
             
         case "pubDate": currentPubDate += string
         case "dc:creator": currentAuthor += string
+        case "thumbnail": currentThumbnail += string
         default: break
         }
     }
@@ -87,7 +89,7 @@ class XMLRSSParser: NSObject, XMLParserDelegate {
             let rssItem = NewsModel(
                 title: currentTitle, link: currentLink,
                 desc: currentDescription, pubDate: currentPubDate,
-                author: currentAuthor, image: nil)
+                author: currentAuthor, thumbnail: currentThumbnail, image: nil)
             
             rss.news += [rssItem]
         } else if elementName == "channel" {

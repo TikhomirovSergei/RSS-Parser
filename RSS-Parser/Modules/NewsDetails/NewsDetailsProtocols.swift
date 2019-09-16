@@ -10,6 +10,7 @@ import Foundation
 import UIKit
 
 protocol NewsDetailsViewProtocol: class {
+    func showAlertView(with text: String)
 }
 
 protocol NewsDetailsPresenterProtocol: class {    
@@ -17,6 +18,7 @@ protocol NewsDetailsPresenterProtocol: class {
     func setViewTitle() -> String
     func getSelectedNews(completion: @escaping (_ image: UIImage?) -> Void) -> NewsModelProtocol?
     func readMoreClicked()
+    func showError(error: String)
 }
 
 protocol NewsDetailsInteractorProtocol: class {
